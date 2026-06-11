@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lab — Solo Practice · d.MBA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+/* ============================================================================
+   CSS copied verbatim from scripts/templates/the-lab.html so the solo build
+   looks identical to the live game, plus a small intro/registration/success
+   block in the d.MBA solo house style at the end.
+   ============================================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f0e8;
+  --card-bg: #ffffff;
+  --border: #444444;
+  --border-light: #d5d0c8;
+  --shadow: 3px 3px 0 #ccc5b8;
+  --text: #1a1a1a;
+  --text-muted: #555555;
+  --blue: #2563EB;
+  --blue-light: #dbeafe;
+  --yellow: #fde68a;
+  --green: #16a34a;
+  --green-light: #dcfce7;
+  --red: #dc2626;
+  --red-light: #fee2e2;
+  --orange: #ea580c;
+  --orange-light: #ffedd5;
+  --purple: #7c3aed;
+  --purple-light: #ede9fe;
+  --font: 'Inter', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+html { font-size: 17.5px; }
+body {
+  font-family: var(--font);
+  background-color: var(--bg);
+  background-image: radial-gradient(circle, #d5d0c8 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== SCREENS ===== */
+.screen {
+  display: none;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 80px;
+  animation: fadeIn 0.35s ease;
+}
+.screen.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.container { max-width: 760px; width: 100%; margin: 0 auto; }
+.container-wide { max-width: 920px; }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 26px 30px;
+  margin-bottom: 20px;
+}
+.card.rot-a { transform: rotate(-0.3deg); }
+.card.rot-b { transform: rotate(0.4deg); }
+.card.no-rotate { transform: none !important; }
+
+/* ===== TYPOGRAPHY ===== */
+.overline {
+  font-family: var(--mono);
+  font-size: 0.72rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--text-muted); margin-bottom: 8px;
+}
+h1 { font-size: clamp(2.1rem, 5vw, 2.9rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.01em; }
+h3 { font-size: 1.25rem; font-weight: 700; }
+h4 { font-size: 1.05rem; font-weight: 700; }
+.highlight { background: linear-gradient(transparent 55%, var(--yellow) 55%); padding-bottom: 2px; }
+.mono { font-family: var(--mono); }
+.text-muted { color: var(--text-muted); }
+.text-small { font-size: 0.85rem; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.blue { color: var(--blue); } .green { color: var(--green); } .red { color: var(--red); }
+.purple { color: var(--purple); } .bold { font-weight: 700; }
+.mt-4{margin-top:4px;}.mt-8{margin-top:8px;}.mt-12{margin-top:12px;}.mt-16{margin-top:16px;}.mt-24{margin-top:24px;}.mt-32{margin-top:32px;}
+.mb-4{margin-bottom:4px;}.mb-8{margin-bottom:8px;}.mb-12{margin-bottom:12px;}.mb-16{margin-bottom:16px;}.mb-24{margin-bottom:24px;}
+.flex{display:flex;}.align-center{align-items:center;}.justify-between{justify-content:space-between;}.gap-8{gap:8px;}.gap-12{gap:12px;}
+.w-full{width:100%;}
+
+/* ===== BUTTONS ===== */
+.btn {
+  font-family: var(--font); font-size: 0.95rem; font-weight: 600;
+  padding: 12px 28px; border: 2px solid var(--border); border-radius: 6px;
+  cursor: pointer; transition: all 0.15s ease; display: inline-block;
+  text-align: center; background: var(--card-bg); color: var(--text);
+}
+.btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+.btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
+.btn-secondary:hover { background: #f0ebe0; }
+.btn-danger { background: var(--red-light); color: var(--red); border-color: var(--red); }
+.btn-danger:hover { background: #fecaca; }
+.btn-success { background: var(--green); color: #fff; border-color: var(--green); }
+.btn-success:hover { background: #15803d; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-lg { padding: 16px 40px; font-size: 1.05rem; }
+.btn-sm { padding: 8px 16px; font-size: 0.85rem; }
+
+/* ===== INPUTS ===== */
+input[type="text"], input[type="email"], input[type="password"] {
+  font-family: var(--font); font-size: 0.95rem; width: 100%;
+  padding: 10px 14px; border: 2px solid var(--border-light); border-radius: 6px;
+  background: var(--card-bg); color: var(--text); outline: none; transition: border-color 0.15s;
+}
+input:focus { border-color: var(--blue); }
+label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+.field { margin-bottom: 18px; }
+
+/* ===== METRICS GRID ===== */
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 12px; }
+.metric-item { background: #f9f6f0; border: 1px solid var(--border-light); border-radius: 8px; padding: 12px 14px; }
+.metric-label { font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 4px; }
+.metric-value { font-family: var(--mono); font-size: 1rem; font-weight: 600; }
+
+/* ===== BUDGET BAR ===== */
+.sprint-container { max-width: 1080px; }
+.budget-bar { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 12px; align-items: stretch; margin-bottom: 20px; }
+.budget-cell { background: var(--card-bg); border: 2px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); padding: 14px 16px; }
+.budget-cell .bc-label { font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+.budget-cell .bc-value { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; margin-top: 2px; }
+.budget-cell .bc-sub { font-family: var(--mono); font-size: 0.66rem; color: var(--text-muted); margin-top: 2px; }
+.gauge-cell { display: flex; flex-direction: column; justify-content: center; }
+.gauge-track { position: relative; height: 24px; background: #ece6d8; border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 6px; }
+.gauge-fill { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, #2563EB, #60a5fa); border-radius: 12px; transition: width 0.6s ease; }
+.gauge-labels { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.62rem; color: var(--text-muted); margin-top: 4px; }
+/* full-width guardrail panel below the budget bar */
+.guard-panel { display: flex; gap: 12px; align-items: flex-start; background: var(--card-bg); border: 2px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); padding: 14px 16px; margin-bottom: 20px; }
+.guard-panel .guard-shield { font-size: 1.3rem; line-height: 1.2; flex-shrink: 0; }
+.guard-panel .guard-body { flex: 1; min-width: 0; }
+.guard-panel .guard-head { font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.guard-panel .guard-explain { font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; margin-top: 6px; }
+.guard-panel .guard-explain strong { color: var(--text); }
+.guard-status { font-family: var(--mono); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 9px; border-radius: 12px; border: 1.5px solid; }
+.guard-unmeasured { background: #f0ebe0; color: var(--text-muted); border-color: var(--border-light); }
+.guard-risk { background: var(--orange-light); color: var(--orange); border-color: var(--orange); }
+.guard-ok { background: var(--green-light); color: var(--green); border-color: var(--green); }
+.guard-breach { background: var(--red-light); color: var(--red); border-color: var(--red); }
+
+/* ===== LOOP PICKER ===== */
+.pick-section { margin-bottom: 18px; }
+.pick-grid { display: grid; gap: 10px; margin-top: 8px; }
+.pick-opt {
+  border: 2px solid var(--border-light); border-radius: 8px; padding: 12px 14px;
+  cursor: pointer; transition: all 0.15s; background: var(--card-bg);
+}
+.pick-opt:hover { border-color: var(--blue); transform: translateY(-1px); }
+.pick-opt.selected { border-color: var(--blue); background: var(--blue-light); box-shadow: 0 0 0 2px rgba(37,99,235,0.2); }
+.pick-opt .po-title { font-weight: 600; font-size: 0.92rem; }
+.pick-opt .po-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; }
+.pick-opt .po-meta { font-family: var(--mono); font-size: 0.72rem; color: var(--blue); margin-top: 6px; }
+.po-evidence { margin-top: 10px; padding: 9px 11px; background: #fbfaf6; border: 1px solid var(--border-light); border-radius: 8px; }
+.po-ev-label { font-family: var(--mono); font-size: 0.54rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 5px; }
+.po-ev-stat { font-size: 0.78rem; line-height: 1.45; color: var(--text); }
+.po-ev-quote { font-size: 0.78rem; line-height: 1.45; color: var(--text-muted); font-style: italic; margin-top: 5px; }
+.po-ev-src { display: block; font-style: normal; font-family: var(--mono); font-size: 0.62rem; color: var(--text-muted); margin-top: 2px; }
+.test-validity { display: inline-block; height: 6px; border-radius: 3px; background: var(--blue); vertical-align: middle; }
+.step-num { display:inline-grid; place-items:center; width:22px; height:22px; background:var(--text); color:#fff; border-radius:50%; font-size:0.72rem; font-weight:700; font-family:var(--mono); margin-right:8px; }
+.pick-section > .overline { display:flex; align-items:center; }
+.step-time { margin-left:auto; font-family:var(--mono); font-size:0.62rem; font-weight:700; text-transform:none; letter-spacing:0; color:var(--text-muted); background:#f0ebe0; border:1px solid var(--border-light); border-radius:10px; padding:2px 8px; }
+.muted-step { opacity: 0.45; pointer-events: none; }
+.pick-opt.pick-disabled { opacity: 0.55; pointer-events: none; background: #f3f0ea; }
+.pick-flag { font-family: var(--mono); font-size: 0.54rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); background: #e8e2d6; border-radius: 8px; padding: 2px 7px; margin-left: 6px; vertical-align: middle; }
+.pick-flag.flag-shipped { color: var(--green); background: var(--green-light); }
+.pick-note { font-size: 0.72rem; color: var(--text-muted); font-style: italic; margin-top: 6px; }
+.ob-points { list-style: none; margin: 0; padding: 0; }
+.ob-points li { font-size: 0.86rem; line-height: 1.5; padding: 8px 0; border-bottom: 1px solid var(--border-light); }
+.ob-points li:last-child { border-bottom: none; }
+.pace-note { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin: 8px 0 0; }
+.pace-note strong { color: var(--text); }
+.ct-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.ct-chip { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 0.84rem; font-weight: 700; padding: 4px 10px; border-radius: 8px; border: 1.5px solid; }
+.ct-money { color: var(--blue); border-color: var(--blue); background: var(--blue-light); }
+.ct-weeks { color: var(--purple); border-color: var(--purple); background: var(--purple-light); }
+.ct-chip.over { color: var(--red); border-color: var(--red); background: var(--red-light); }
+.ct-note { font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+.ct-evidence { font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px; margin-left: auto; }
+.ba-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; font-size: 0.84rem; line-height: 1.45; }
+.ba-before { color: var(--text-muted); }
+.ba-after { color: var(--text); font-weight: 600; }
+.ba-arrow { color: var(--blue); font-weight: 700; }
+.ba-tag { font-family: var(--mono); font-size: 0.54rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-right: 5px; vertical-align: 1px; }
+.pick-intro { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; margin: 8px 0 14px; }
+.pick-intro p { margin: 0 0 8px; }
+.pick-clue { background: var(--blue-light); border: 1px solid var(--blue); color: #1e3a8a; border-radius: 8px; padding: 8px 12px; margin: 0; }
+.pick-prompt { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; margin: 8px 0 12px; padding: 9px 13px; background: #fbfaf6; border-left: 3px solid var(--purple); border-radius: 0 6px 6px 0; }
+.pick-prompt strong { color: var(--text); }
+.pick-prompt em { color: var(--purple); font-style: normal; font-weight: 600; }
+
+/* ===== READING PANEL ===== */
+.reading-panel { border: 2px solid var(--border); border-radius: 10px; padding: 20px 22px; background: #fbfaf6; }
+.verdict-badge { display: inline-block; font-family: var(--mono); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 12px; border-radius: 14px; }
+.verdict-accept { background: var(--green-light); color: var(--green); border: 1.5px solid var(--green); }
+.verdict-reject { background: var(--red-light); color: var(--red); border: 1.5px solid var(--red); }
+.reading-est { font-family: var(--mono); font-size: 2.2rem; font-weight: 700; }
+.reading-context { font-size: 0.8rem; color: var(--text-muted); margin-top: 5px; line-height: 1.5; }
+.reading-context strong { color: var(--text); }
+.reading-reliability { font-size: 0.84rem; margin-top: 8px; line-height: 1.5; font-weight: 600; }
+.reading-reliability.low { color: var(--orange); }
+.reading-reliability.medium { color: var(--text-muted); }
+.reading-reliability.high { color: var(--green); }
+.decision-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 14px; line-height: 1.55; }
+.reading-results-head { margin-bottom: 14px; }
+.reading-results-head .text-small { margin-top: 3px; line-height: 1.5; }
+.reading-rec { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; margin-top: 14px; padding: 12px 14px; border-radius: 8px; border: 1.5px solid var(--border-light); line-height: 1.55; }
+.reading-rec .rec-badge { font-family: var(--mono); font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 10px; border-radius: 12px; white-space: nowrap; flex-shrink: 0; }
+.reading-rec .rec-line { font-size: 0.86rem; flex: 1; min-width: 180px; }
+.reading-rec.rec-go { background: var(--green-light); border-color: var(--green); }
+.reading-rec.rec-go .rec-badge { background: var(--green); color: #fff; }
+.reading-rec.rec-maybe { background: #fef9c3; border-color: #d97706; }
+.reading-rec.rec-maybe .rec-badge { background: #d97706; color: #fff; }
+.reading-rec.rec-no { background: #f3f0ea; border-color: var(--border); }
+.reading-rec.rec-no .rec-badge { background: var(--text-muted); color: #fff; }
+.reading-rec.rec-risk { background: var(--red-light); border-color: var(--red); }
+.reading-rec.rec-risk .rec-badge { background: var(--red); color: #fff; }
+.reading-actions { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.do-label { font-family: var(--mono); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-top: 18px; margin-bottom: 8px; }
+.decision-options { display: flex; flex-direction: column; gap: 10px; }
+.decision-opt { display: flex; flex-direction: column; gap: 3px; text-align: left; width: 100%; padding: 13px 16px; border-radius: 10px; border: 2px solid; cursor: pointer; transition: transform 0.1s ease, box-shadow 0.1s ease; background: var(--card-bg); }
+.decision-opt:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow); }
+.decision-opt:disabled { opacity: 0.5; cursor: not-allowed; }
+.decision-opt .do-title { font-weight: 700; font-size: 1.02rem; }
+.decision-opt .do-sub { font-size: 0.79rem; line-height: 1.45; font-weight: 400; color: var(--text-muted); }
+.decision-opt .do-sub em { font-style: normal; color: var(--text); font-weight: 600; }
+.do-build { border-color: var(--green); background: var(--green-light); }
+.do-build .do-title { color: #14532d; }
+.do-validate { border-color: var(--blue); background: var(--blue-light); }
+.do-validate .do-title { color: #1e3a8a; }
+.do-drop { border-color: var(--border); }
+.rationale-field { margin-top: 16px; }
+.rationale-field label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; }
+.rationale-field label .opt { color: var(--text-muted); font-weight: 400; }
+.rationale-field textarea { width: 100%; font-family: inherit; font-size: 0.86rem; padding: 8px 10px; border: 1.5px solid var(--border-light); border-radius: 6px; resize: vertical; background: var(--card-bg); }
+.rationale-field textarea:focus { outline: none; border-color: var(--blue); }
+.s-rationale { font-size: 0.72rem; color: var(--text-muted); font-style: italic; margin-top: 4px; }
+.warn-box { background: var(--orange-light); border: 1.5px solid var(--orange); color: #9a3412; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; margin-top: 14px; }
+
+/* ===== BUILD RESULT BEAT ===== */
+.result-panel { border: 2px solid var(--border); border-radius: 10px; padding: 22px; }
+.result-panel.good { background: var(--green-light); border-color: var(--green); }
+.result-panel.warn { background: var(--orange-light); border-color: var(--orange); }
+.result-panel.neutral { background: #fbfaf6; }
+.result-compare { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; margin: 16px 0 14px; }
+.result-num { font-family: var(--mono); font-weight: 700; font-size: 1.9rem; line-height: 1; }
+.result-num .rn-label { display: block; font-family: var(--mono); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; }
+.result-arrow { font-size: 1.5rem; color: var(--text-muted); padding-bottom: 2px; }
+.result-headline { font-size: 1.08rem; font-weight: 700; margin-bottom: 6px; }
+.s-delta { font-family: var(--mono); font-size: 0.66rem; font-weight: 600; }
+.s-delta.under { color: var(--green); }
+.s-delta.over { color: var(--red); }
+.s-delta.close { color: var(--text-muted); }
+
+/* ===== ONBOARDING + RE-ACCESSIBLE BRIEFING ===== */
+.metric-item.clue { border-color: var(--blue); background: var(--blue-light); }
+.metric-note { font-size: 0.66rem; color: var(--text-muted); line-height: 1.35; margin-top: 4px; }
+.clue-tag { display: inline-block; font-family: var(--mono); font-size: 0.54rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--blue); margin-left: 6px; }
+.brand-lockup { display: flex; align-items: center; gap: 14px; }
+.brand-mark { display: inline-flex; flex-shrink: 0; box-shadow: var(--shadow); border-radius: 11px; }
+.brand-words { flex: 1; min-width: 0; }
+.brand-stage { background: #f0ebe0; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-light); white-space: nowrap; }
+.company-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-light); }
+.company-facts .fact { display: flex; flex-direction: column; gap: 1px; }
+.company-facts .fact-k { font-family: var(--mono); font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+.company-facts .fact-v { font-size: 0.84rem; font-weight: 600; }
+.signup-path { margin: 0; padding-left: 0; list-style: none; counter-reset: sp; }
+.signup-path li { position: relative; padding: 6px 0 6px 34px; font-size: 0.88rem; line-height: 1.5; counter-increment: sp; }
+.signup-path li::before { content: counter(sp); position: absolute; left: 0; top: 5px; width: 22px; height: 22px; border-radius: 50%; background: var(--blue-light); color: var(--blue); border: 1.5px solid var(--blue); font-family: var(--mono); font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.signup-path li:last-child::before { background: var(--green-light); color: var(--green); border-color: var(--green); }
+.signup-path li:last-child { font-weight: 600; }
+.mission-anchor { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; padding: 9px 14px; background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 8px; line-height: 1.55; }
+.mission-anchor strong { color: var(--text); }
+.modal-overlay { position: fixed; inset: 0; background: rgba(20,18,14,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; z-index: 50; }
+.modal-card { background: var(--card-bg); border: 2px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); padding: 24px 26px; max-width: 560px; width: 100%; }
+.solo-toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px); background: var(--text); color: #fff; padding: 11px 18px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 6px 24px rgba(0,0,0,0.25); opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 80; }
+.solo-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.brief-loop { margin: 0 0 0 18px; line-height: 1.8; font-size: 0.88rem; }
+.brief-section { margin-top: 16px; }
+/* ===== glossary / tap-to-explain ===== */
+.gloss { border-bottom: 1px dotted var(--text-muted); cursor: help; }
+.gloss:focus { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 2px; }
+.gloss-pop { position: fixed; z-index: 70; max-width: 280px; background: var(--text); color: #fff; font-size: 0.8rem; line-height: 1.5; padding: 10px 13px; border-radius: 8px; box-shadow: 0 4px 18px rgba(0,0,0,0.28); }
+.gloss-pop .gp-term { font-weight: 700; display: block; margin-bottom: 3px; }
+.gloss-list { margin: 8px 0 0; }
+.gloss-list dt { font-weight: 700; font-size: 0.86rem; margin-top: 10px; }
+.gloss-list dd { margin: 2px 0 0; font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; }
+/* sticky finish-sprint bar */
+.end-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: rgba(245,240,232,0.96); border-top: 1px solid var(--border-light); padding: 10px 16px; text-align: center; box-shadow: 0 -2px 12px rgba(0,0,0,0.06); }
+.btn-finish { background: var(--text); color: #fff; border-color: var(--text); }
+.btn-finish:hover { opacity: 0.9; }
+#screen-sprint .container { padding-bottom: 88px; }
+
+/* ===== PROGRESS SHEET ===== */
+.sheet { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.sheet th { font-family: var(--mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); text-align: left; padding: 8px 8px; border-bottom: 2px solid var(--border); }
+.sheet td { padding: 9px 8px; border-bottom: 1px solid #ece6d8; vertical-align: top; }
+.sheet tr:last-child td { border-bottom: none; }
+.sheet .s-built { color: var(--green); font-weight: 700; font-family: var(--mono); font-size: 0.72rem; }
+.sheet .s-dropped { color: var(--text-muted); font-weight: 600; font-family: var(--mono); font-size: 0.72rem; }
+.sheet .s-screened { color: var(--purple); font-weight: 700; font-family: var(--mono); font-size: 0.72rem; }
+.sheet .s-num { font-family: var(--mono); }
+.sheet .trap-row { background: var(--red-light); }
+.empty-sheet { color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 18px; }
+.pill { font-family: var(--mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border-light); color: var(--text-muted); }
+.pill.done { background: var(--green-light); color: var(--green); border-color: var(--green); }
+.pill.trap { background: var(--red-light); color: var(--red); border-color: var(--red); }
+.progress-tag { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); background: var(--card-bg); border: 1px solid var(--border-light); border-radius: 20px; padding: 4px 12px; display: inline-block; margin-bottom: 24px; }
+
+/* ===== LEADERBOARD ===== */
+.lb-card { background: var(--card-bg); border: 2px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); padding: 18px 22px; margin-bottom: 14px; display: grid; grid-template-columns: 44px 1fr auto; gap: 16px; align-items: center; transition: all 0.4s ease; }
+.lb-card.winner { border-color: var(--green); background: var(--green-light); box-shadow: 3px 3px 0 #86efac; }
+.lb-card.you { border-color: var(--blue); box-shadow: 3px 3px 0 #93c5fd; }
+.lb-card.breach { border-color: var(--red); background: var(--red-light); box-shadow: 3px 3px 0 #fca5a5; }
+.lb-rank { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; color: var(--text-muted); text-align: center; }
+.lb-rank.gold { color: #d97706; }
+.lb-name { font-weight: 700; font-size: 1.05rem; }
+.lb-meta { font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
+.lb-mid { min-width: 0; }
+.lb-stats { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 5px; }
+.lb-stat { font-family: var(--mono); font-size: 0.74rem; color: var(--text-muted); }
+.lb-stat b { color: var(--text); font-size: 0.84rem; }
+.lb-right { display: flex; align-items: center; gap: 16px; }
+.lb-retbox { text-align: center; padding: 6px 12px; border-radius: 10px; border: 2px solid; min-width: 84px; }
+.lb-retbox.good { border-color: var(--green); background: var(--green-light); }
+.lb-retbox.bad { border-color: var(--red); background: var(--red-light); }
+.lb-ret-num { font-family: var(--mono); font-weight: 700; font-size: 1.55rem; line-height: 1; }
+.lb-retbox.good .lb-ret-num { color: var(--green); }
+.lb-retbox.bad .lb-ret-num { color: var(--red); }
+.lb-ret-label { font-family: var(--mono); font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-top: 4px; line-height: 1.25; }
+.lb-scorebox { text-align: right; min-width: 60px; }
+.lb-score { font-family: var(--mono); font-size: 1.7rem; font-weight: 700; text-align: right; line-height: 1; }
+.lb-score.green { color: var(--green); }
+.lb-score.red { color: var(--red); }
+.lb-score-label { font-family: var(--mono); font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== DISCUSSION ===== */
+.discussion-card { background: var(--yellow); border: 2px solid #d97706; border-radius: 10px; padding: 20px 24px; margin-top: 24px; }
+.discussion-card h4 { margin-bottom: 12px; color: #92400e; }
+.discussion-card ol { padding-left: 20px; }
+.discussion-card li { margin-bottom: 10px; font-size: 0.88rem; color: #713f12; line-height: 1.5; }
+
+/* notes card */
+.notes-card { background: #fefce8; border: 2px solid var(--border); border-radius: 10px; padding: 20px 24px; margin: 0 auto 24px; text-align: left; }
+.notes-card .overline { color: #92400e; }
+.notes-card ul { margin: 8px 0 8px 18px; }
+.notes-card li { margin-bottom: 6px; font-size: 0.88rem; }
+
+@media (max-width: 640px) {
+  .budget-bar { grid-template-columns: 1fr 1fr; }
+  .gauge-cell { grid-column: 1 / -1; }
+  .sheet { font-size: 0.72rem; }
+}
+
+/* ===== SOLO-ONLY: intro / registration / reflection / success (d.MBA house style) ===== */
+.intro-inner {
+  background: #fff; border-radius: 16px; padding: 52px 44px 44px;
+  border: 2.5px solid var(--border); box-shadow: 4px 4px 0 var(--border-light);
+  max-width: 540px; margin: 0 auto; text-align: center; transform: rotate(-0.5deg);
+}
+.intro-the { font-size: 1rem; color: #888; font-weight: 400; margin-bottom: 4px; letter-spacing: 0.08em; }
+.intro-title { font-size: clamp(36px, 7vw, 52px); font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; }
+.intro-rule { height: 3px; border-radius: 2px; background: var(--blue); width: 60px; margin: 20px auto 18px; }
+.intro-subtitle { font-size: 0.95rem; color: var(--text-muted); font-weight: 500; margin-bottom: 30px; line-height: 1.6; }
+.intro-badge { display: inline-block; background: var(--yellow); border: 1.5px solid #d4a800; border-radius: 20px; padding: 4px 14px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 24px; color: #7c6600; }
+.register-inner { background: #fff; padding: 36px 32px; border-radius: 16px; border: 2px solid var(--border); box-shadow: var(--shadow); max-width: 560px; margin: 0 auto; }
+.reg-header { text-align: center; margin-bottom: 8px; }
+.reg-subtitle { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 26px; text-align: center; }
+.reg-section-title { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; color: var(--blue); margin-bottom: 12px; }
+.checklist { list-style: none; padding: 0; margin: 0; }
+.checklist li { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; margin-bottom: 8px; border: 2px solid #e0dcd4; border-radius: 10px; background: #fff; cursor: pointer; transition: all 0.15s; user-select: none; }
+.checklist li:hover { background: #faf6ef; border-color: #aaa; }
+.checklist li.checked { border-color: var(--blue); background: #eff6ff; }
+.check-box { width: 22px; height: 22px; border: 2px solid #888; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; font-size: 0.82rem; color: transparent; }
+.checklist li.checked .check-box { background: var(--blue); border-color: var(--blue); color: #fff; }
+.check-text { font-size: 0.88rem; line-height: 1.5; color: var(--text); }
+.check-text small { display: block; font-size: 0.78rem; color: #888; margin-top: 2px; }
+.form-error { color: var(--red); font-size: 0.84rem; margin: 12px 0 0; display: none; text-align: center; }
+.success-card { text-align: center; padding: 48px 32px; background: var(--green-light); border: 2px solid var(--green); border-radius: 16px; margin-top: 40px; }
+.success-icon { font-size: 3rem; margin-bottom: 12px; }
+.confidence-row { display: flex; align-items: center; gap: 12px; }
+.confidence-row input[type="range"] { flex: 1; accent-color: var(--blue); }
+.confidence-value { font-family: var(--mono); font-weight: 700; font-size: 1.1rem; min-width: 64px; text-align: center; }
+textarea { width: 100%; padding: 12px 14px; border: 2px solid var(--border-light); border-radius: 8px; font-family: var(--font); font-size: 0.92rem; outline: none; line-height: 1.55; background: #fff; resize: vertical; min-height: 84px; }
+textarea:focus { border-color: var(--blue); }
+.reflect-card label { display: block; font-weight: 600; font-size: 0.92rem; margin-bottom: 10px; }
+.optional-tag { font-family: var(--mono); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); background: var(--bg); padding: 2px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<!-- =============== INTRO =============== -->
+<div id="screen-intro" class="screen active">
+  <div class="container">
+    <div class="intro-inner">
+      <div class="intro-the">THE</div>
+      <div class="intro-title"><span class="highlight">Lab</span></div>
+      <div class="intro-rule"></div>
+      <div class="intro-badge">SOLO PRACTICE</div>
+      <div class="intro-subtitle">
+        A metric is stuck. You have one quarter, a fixed budget, and a menu of tests.<br>
+        Run the cheapest experiment that tells you the truth — then build only what the data backs.
+      </div>
+      <button class="btn btn-primary btn-lg" id="intro-start-btn">Start →</button>
+    </div>
+    <p class="text-small text-muted" style="text-align:center; margin-top:24px;">
+      Self-paced. About 20 minutes. Built for d.MBA's Business &amp; Design Metrics module.
+    </p>
+  </div>
+</div>
+
+<!-- =============== REGISTRATION / INTRO GATE =============== -->
+<div id="screen-register" class="screen">
+  <div class="container" style="display:flex; align-items:center; justify-content:center; min-height:100vh;">
+    <div class="register-inner">
+      <div class="reg-header"><h2><span class="highlight">Before you play</span></h2></div>
+      <p class="reg-subtitle">Make sure you're prepared, then jump in.</p>
+
+      <div class="reg-section-title">YOUR DETAILS</div>
+      <div class="field" style="margin-bottom:12px;">
+        <input type="text" id="reg-name" placeholder="Your name" autocomplete="name">
+      </div>
+      <div class="field" style="margin-bottom:4px;">
+        <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+
+      <div class="reg-section-title" style="margin-top:24px;">PRE-REQUISITE CHECKLIST</div>
+      <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">To get the most from this game, you should have completed the following:</p>
+      <ul class="checklist" id="prereq-list">
+        <li data-key="ondemand">
+          <div class="check-box">&#10003;</div>
+          <div class="check-text">
+            I've watched the on-demand content for the Business &amp; Design Metrics module
+            <small>The metrics concepts and the Metrics Canvas you'll apply in-game.</small>
+          </div>
+        </li>
+        <li data-key="recording">
+          <div class="check-box">&#10003;</div>
+          <div class="check-text">
+            I've watched the recording of the live session
+            <small>The recap and Q&amp;A from the live workshop that sets the scene.</small>
+          </div>
+        </li>
+      </ul>
+
+      <div id="reg-error" class="form-error">Please enter your name, a valid email, and check both items above.</div>
+      <button class="btn btn-primary" style="width:100%; padding:14px 28px; margin-top:18px;" id="reg-continue-btn">Continue &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============== ONBOARDING 1: THE BRIEF =============== -->
+<div id="screen-onboard-brief" class="screen">
+  <div class="container">
+    <div class="progress-tag">Briefing — 1 of 2</div>
+    <div class="overline">Your Company</div>
+
+    <div class="brand-lockup mb-16">
+      <span class="brand-mark" id="ob-logo"></span>
+      <div class="brand-words">
+        <h2 id="ob-company" style="margin:0;">Cadence</h2>
+        <p class="text-small text-muted" id="ob-tagline" style="margin:2px 0 0;"></p>
+      </div>
+      <span class="brand-stage mono text-small text-muted" id="ob-stage"></span>
+    </div>
+
+    <div class="card no-rotate">
+      <p class="text-small" style="line-height:1.7;" id="ob-brief"></p>
+      <div class="company-facts" id="ob-facts"></div>
+    </div>
+
+    <div class="card no-rotate">
+      <div class="overline mb-8">What counts as &ldquo;activated&rdquo;</div>
+      <p class="text-small mb-16" id="ob-activation-plain" style="line-height:1.7;"></p>
+      <div class="overline mb-8">The path to first value</div>
+      <ol class="signup-path" id="ob-signup-path"></ol>
+    </div>
+
+    <div class="card no-rotate">
+      <div class="overline" style="margin-bottom:6px;">Context — the business at a glance</div>
+      <div class="metrics-grid" id="ob-kpis"></div>
+    </div>
+
+    <div class="card no-rotate" style="background:#fef9c3; border-color:#d97706;">
+      <div class="overline" style="color:#92400e;">The two numbers that matter this quarter</div>
+      <div class="flex gap-12 mt-8" style="flex-wrap:wrap;">
+        <div style="flex:1; min-width:200px;">
+          <div class="text-small text-muted mono">PRIMARY METRIC</div>
+          <div class="bold" id="ob-primary" style="font-size:1.05rem;"></div>
+          <div class="text-small text-muted mt-4" id="ob-primary-def"></div>
+        </div>
+        <div style="flex:1; min-width:200px;">
+          <div class="text-small text-muted mono">GUARDRAIL — do not sacrifice</div>
+          <div class="bold" id="ob-secondary" style="font-size:1.05rem;"></div>
+          <div class="text-small text-muted mt-4" id="ob-secondary-def"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-right">
+      <button class="btn btn-primary btn-lg" id="ob-next-btn">How the lab works →</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============== ONBOARDING 2: HOW IT WORKS =============== -->
+<div id="screen-onboard-howto" class="screen">
+  <div class="container">
+    <div class="progress-tag">Briefing — 2 of 2</div>
+    <div class="overline">How the lab works</div>
+    <h2 class="mb-16"><span class="highlight">Test cheap. Build only what the data backs.</span></h2>
+
+    <div class="card no-rotate">
+      <h4 class="mb-12">Every experiment is one loop:</h4>
+      <ol style="margin-left:18px; line-height:1.9;">
+        <li><strong>Pick a problem</strong> — why isn't activation higher right now?</li>
+        <li><strong>Pick a solution</strong> — a candidate fix for that problem.</li>
+        <li><strong>Choose a test</strong> — cheap and noisy, or pricey and reliable?</li>
+        <li><strong>Read the data</strong> — the test says accept or reject, with an estimate.</li>
+        <li><strong>Build or drop</strong> — building spends the build cost and moves the metric for real.</li>
+      </ol>
+      <p class="text-small text-muted mt-12">Repeat until you run out of budget or weeks, or you hit the target. Your whole history is your <strong>Progress Sheet</strong>.</p>
+    </div>
+
+    <div class="card no-rotate">
+      <div class="overline mb-8">Two things to remember</div>
+      <ul class="ob-points">
+        <li>💸 <strong>One shared budget.</strong> Tests and builds both spend your $50K. Screen ideas cheaply first — then spend big only on the winners.</li>
+        <li>🛡️ <strong>Activation is your score. Retention is the real goal.</strong> Some ideas lift activation but secretly hurt retention. Don't break the <span class="gloss" data-gloss="guardrail" tabindex="0" role="button">guardrail</span>.</li>
+      </ul>
+    </div>
+
+    <div class="card no-rotate" id="ob-budget-card">
+      <div class="overline mb-8">How you win</div>
+      <ul class="ob-points">
+        <li>🏆 <strong>Best value wins.</strong> Your score is activation gained per dollar — a cheap win beats an expensive one.</li>
+        <li>🎯 <strong>45% is the goal</strong>, but getting part-way for far less money can still put you top.</li>
+        <li>💡 <strong>Leftover budget is fine; wasted budget isn't.</strong></li>
+      </ul>
+      <p class="text-small" id="ob-budget" style="margin-top:10px;"></p>
+    </div>
+
+    <div class="text-right">
+      <button class="btn btn-secondary" id="ob-back-btn" style="margin-right:8px;">← Back</button>
+      <button class="btn btn-success btn-lg" id="ob-enter-btn">Enter the Lab →</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============== SPRINT WORKSPACE =============== -->
+<div id="screen-sprint" class="screen">
+  <div class="container sprint-container">
+    <div class="flex align-center justify-between mb-8">
+      <div class="progress-tag" style="margin-bottom:0;">The Sprint</div>
+      <div class="flex align-center gap-8">
+        <button class="btn btn-sm btn-secondary" id="open-brief-btn">📋 Briefing</button>
+      </div>
+    </div>
+    <div class="mission-anchor" id="mission-anchor"></div>
+
+    <!-- budget + metric bar -->
+    <div class="budget-bar">
+      <div class="budget-cell">
+        <div class="bc-label">Money left</div>
+        <div class="bc-value blue" id="bc-money">$50K</div>
+        <div class="bc-sub" id="bc-money-sub">of $50K</div>
+      </div>
+      <div class="budget-cell">
+        <div class="bc-label">Weeks left</div>
+        <div class="bc-value purple" id="bc-weeks">14</div>
+        <div class="bc-sub" id="bc-weeks-sub">of 14</div>
+      </div>
+      <div class="budget-cell gauge-cell">
+        <div class="bc-label" id="gauge-label">Activation</div>
+        <div class="gauge-track"><div class="gauge-fill" id="gauge-fill" style="width:0%;"></div></div>
+        <div class="gauge-labels"><span id="gauge-base">28%</span><span id="gauge-cur" class="bold blue">28%</span><span id="gauge-target">target 45%</span></div>
+      </div>
+    </div>
+
+    <!-- guardrail (retention) — full width -->
+    <div class="guard-panel" id="guardrail-panel"></div>
+
+    <!-- the loop -->
+    <div class="card no-rotate" id="loop-card">
+      <div id="loop-picker"></div>
+      <div id="loop-reading" style="display:none;"></div>
+      <div id="loop-result" style="display:none;"></div>
+    </div>
+
+    <!-- progress sheet -->
+    <div class="card no-rotate">
+      <div class="overline mb-8">Your Progress Sheet</div>
+      <div id="sheet-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- =============== STICKY "DONE" BAR =============== -->
+<div id="end-sprint-bar" class="end-bar" style="display:none;">
+  <button class="btn btn-lg btn-finish" id="end-sprint-btn">✓ I'm done — see my results</button>
+</div>
+
+<!-- =============== RE-ACCESSIBLE BRIEFING OVERLAY =============== -->
+<div id="brief-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal-card">
+    <div class="flex align-center justify-between mb-12">
+      <div class="overline" style="margin-bottom:0;">Briefing</div>
+      <button class="btn btn-sm btn-secondary" id="close-brief-btn">✕ Close</button>
+    </div>
+    <div id="brief-overlay-body"></div>
+  </div>
+</div>
+
+<!-- =============== REVEAL =============== -->
+<div id="screen-reveal" class="screen">
+  <div class="container container-wide">
+    <div class="text-center mb-24">
+      <div class="overline" id="reveal-overline">The Results</div>
+      <h2><span class="highlight" id="reveal-title">Activation results</span></h2>
+      <p class="text-muted text-small mt-8" id="reveal-sub">Ranked by activation lifted per dollar spent.</p>
+    </div>
+
+    <div id="reveal-leaderboard"></div>
+
+    <div class="text-center mt-24" id="reveal-controls">
+      <button class="btn btn-danger btn-lg" id="toggle-reveal-btn" style="margin-right:8px;">Reveal retention impact →</button>
+      <button class="btn btn-primary btn-lg" id="open-debrief-btn" style="display:none;">See the debrief →</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============== DEBRIEF =============== -->
+<div id="screen-debrief" class="screen">
+  <div class="container container-wide">
+    <div class="text-center mb-24">
+      <div class="overline">The Debrief</div>
+      <h2><span class="highlight">What the data really said</span></h2>
+    </div>
+    <div id="debrief-leaderboard"></div>
+
+    <div class="notes-card" id="debrief-lesson" style="max-width:920px;">
+      <div class="overline">The lesson</div>
+      <h3 class="mt-4 mb-12">The smallest valid test that moves the metric beats the biggest build.</h3>
+      <ul>
+        <li><strong>The cheapest valid test beats the biggest build.</strong> A team that screened cheaply and built only the winners gets more activation per dollar than one that full-built everything. Efficiency is the score, not raw lift.</li>
+        <li><strong>Activation is the score; retention is the real goal.</strong> The board ranks you on activation per dollar — but the guardrail (week-4 retention) is what actually keeps Cadence alive. A win that breaks it isn't a win.</li>
+        <li><strong>Name the trap: the sample-workspace.</strong> Auto-filling new accounts with fake check-ins was the cheapest way to spike activation (+11) — and it quietly cost 8 points of retention. The primary metric went up while the real goal fell. That's the Metrics Canvas lesson in product form. Only a strong test (an A/B on a live cohort) could catch it before you shipped.</li>
+        <li><strong>The durable win was &ldquo;invite a teammate first.&rdquo;</strong> It fixed the root cause — a check-in is worthless until a teammate sees it — lifting both activation and retention.</li>
+      </ul>
+    </div>
+
+    <div class="discussion-card" id="debrief-discussion">
+      <h4 id="debrief-heading">Reflect on your sprint</h4>
+      <ol id="debrief-prompts"></ol>
+    </div>
+
+    <div class="card no-rotate" style="margin-top:24px;">
+      <div class="reflect-card">
+        <label>How confident are you that you'd run experiments this way on your own real product? <span class="text-muted text-small">(if you had to)</span></label>
+        <div class="confidence-row">
+          <span class="text-small">1</span>
+          <input type="range" id="ref-confidence" min="1" max="10" value="6">
+          <span class="text-small">10</span>
+          <span class="confidence-value"><span id="ref-confidence-value">6</span>/10</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card no-rotate">
+      <div class="reflect-card">
+        <label for="ref-takeaway">What's your biggest takeaway from this sprint?</label>
+        <textarea id="ref-takeaway" placeholder="One thing you noticed about screening cheap before building, or about the gap between a metric and the real goal."></textarea>
+      </div>
+    </div>
+
+    <div class="card no-rotate">
+      <div class="reflect-card">
+        <label for="ref-application">Where would you apply this in your real work?</label>
+        <textarea id="ref-application" placeholder="A project, decision, or conversation where running the cheapest valid test first would help."></textarea>
+      </div>
+    </div>
+
+    <div class="card no-rotate">
+      <div class="reflect-card">
+        <label for="ref-surprise">What surprised you most — about the trap, your own calls, or the leaderboard?</label>
+        <textarea id="ref-surprise" placeholder="Something you expected to go one way that went another."></textarea>
+      </div>
+    </div>
+
+    <div class="card no-rotate">
+      <div class="reflect-card">
+        <label for="ref-other">Anything else? <span class="optional-tag">optional</span></label>
+        <textarea id="ref-other" placeholder="Questions, frustrations, things you'd want from a follow-up session."></textarea>
+      </div>
+    </div>
+
+    <div id="ref-error" class="form-error" style="text-align:right;">Answer the three required questions to send.</div>
+
+    <div class="text-right mt-16">
+      <button class="btn btn-secondary" id="play-again-btn" style="margin-right:8px;">↻ Play again</button>
+      <button class="btn btn-primary btn-lg" id="ref-submit-btn">Send my reflection →</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============== SUCCESS =============== -->
+<div id="screen-success" class="screen">
+  <div class="container">
+    <div class="success-card">
+      <div class="success-icon">📨</div>
+      <h2>Sent.</h2>
+      <p class="mt-16 text-muted">Your results and reflection are on their way to <strong id="ref-confirm-email"></strong> and to the d.MBA team.</p>
+      <p class="mt-16 text-small text-muted">Want to try it again with a different strategy?</p>
+      <button class="btn btn-primary mt-16" id="success-again-btn">Play again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================================
+   THE LAB — Solo Practice. Self-contained. No server, no WebSocket.
+   The engine is ported from scripts/sim.py; the scenario (incl. hidden truth)
+   from scripts/scenario.py; the bots replicate scripts/server.py's simulate.
+   ============================================================================ */
+
+/* ---------- Engine constants (game_config.py) ---------- */
+const CFG = {
+  NOISE_MAX: 6.0,
+  ACCEPT_THRESHOLD: 3.0,
+  TRAP_DETECT_VALIDITY: 0.90,
+  WEEK_TO_MONEY: 3.0,
+  MIN_DENOM: 5.0,
+  EFFICIENCY_WEIGHT: 1.0,
+  TARGET_BONUS: 8.0,
+  GUARDRAIL_PEN_PER_PT: 3.5,
+  STARTING_MONEY: 50,
+  STARTING_WEEKS: 14,
+};
+
+/* ---------- Scenario data (scenario.py) ---------- */
+const COMPANY = {
+  name: "Cadence",
+  tagline: "Async daily check-ins for remote teams",
+  stage: "Seed → Series A",
+  founded: "2021",
+  hq: "Remote-first · HQ in Lisbon",
+  team_size: "32 people",
+  market: "Distributed product & engineering teams, 10–200 people",
+  pricing: "$8 / seat / month",
+  kpis: {
+    signups_per_month: "3,100",
+    activation_rate: "28%",
+    week4_retention: "55%",
+    team_seats_avg: "6",
+    solo_signups: "41%",
+    time_to_first_value: "2 days",
+  },
+  brief: "Cadence replaces the daily standup meeting with a short written check-in — what I did, what's next, where I'm stuck — that everyone posts on their own time. Founded in 2021, it's a 32-person, remote-first company on an $8/seat/month plan, selling to distributed product and engineering teams. Plenty of people sign up — 3,100 a month — but only 28% ever reach first value in their first week. The board wants activation up. Your design team has one quarter.",
+  activation_def_plain: "A user counts as 'activated' once they post a check-in AND a teammate sees it, within their first 7 days. Posting into the void doesn't count — the value only lands when someone on the team actually reads it.",
+  signup_path: [
+    "Sign up with email or Google",
+    "Create a workspace (or join one you're invited to)",
+    "Invite teammates so check-ins have an audience",
+    "Write your first check-in",
+    "A teammate sees it and reacts — first value reached",
+  ],
+  challenge: "Lift activation from 28% to 45% — without gutting the thing that actually keeps Cadence alive: week-4 retention of the people who do activate. Run the cheapest experiments that tell you what works, then build only what the data backs.",
+};
+
+const PRIMARY = {
+  key: "activation", label: "Activation rate", unit: "%",
+  baseline: 28.0, target: 45.0,
+  definition: "% of new signups who post a check-in AND have a teammate see it within 7 days.",
+};
+
+const SECONDARY = {
+  key: "retention", label: "Week-4 retention", unit: "%",
+  baseline: 55.0, floor: 55.0,
+  definition: "% of activated users still posting check-ins at week 4. The real goal lives here.",
+};
+
+const PROBLEMS = [
+  {
+    id: "too-many-steps",
+    label: "Setup has too many steps",
+    hypothesis: "New users abandon during a long multi-step setup before they ever post a check-in.",
+    evidence: {
+      stat: "62% of new signups drop off inside the setup wizard — a median of 9 screens before they reach the product.",
+      quote: "Half my onboarding tickets are people who gave up before they ever got in.",
+      source: "Maya, Support Lead",
+    },
+    solutions: [
+      { id: "guided-checklist", label: "Replace the wizard with a 3-step guided checklist", desc: "Strip setup to connect → write → share, with a visible checklist.", before: "a long multi-step setup wizard", after: "3 clear steps: connect → write → share", true_primary: 7.0, true_secondary: 1.0, is_trap: false, build_cost: 12, build_weeks: 3 },
+      { id: "trim-fields", label: "Cut optional setup fields to the bare minimum", desc: "Defer avatars, timezones and integrations until after first value.", before: "setup asks for avatars, timezones, integrations up front", after: "just the essentials now, the rest can wait", true_primary: 4.0, true_secondary: 0.0, is_trap: false, build_cost: 5, build_weeks: 2 },
+      { id: "progress-bar", label: "Add a progress bar to the existing wizard", desc: "Same nine steps, now with a bar showing how far along they are.", before: "9 steps with no sense of progress", after: "the same 9 steps, now with a progress bar", true_primary: 1.0, true_secondary: 0.0, is_trap: false, build_cost: 4, build_weeks: 1 },
+    ],
+  },
+  {
+    id: "value-unclear",
+    label: "New users don't get what they'll gain",
+    hypothesis: "Signups reach an empty product and never understand what a good check-in looks like.",
+    evidence: {
+      stat: "Of the users who do finish setup, 40% never write a single check-in.",
+      quote: "People land in an empty workspace and ask me 'what am I even supposed to write here?'",
+      source: "Dev, UX Researcher",
+    },
+    solutions: [
+      { id: "sample-workspace", label: "Auto-fill the account with sample check-ins", desc: "Seed every new workspace with fake activity so it looks alive on day one.", before: "a new workspace sits empty", after: "pre-filled with sample check-ins on day one", true_primary: 11.0, true_secondary: -8.0, is_trap: true, build_cost: 7, build_weeks: 2 },
+      { id: "explainer-video", label: "Add a 60-second explainer video on first load", desc: "A welcome modal that plays a product tour video.", before: "new users land with no guidance", after: "a 60-second welcome video plays first", true_primary: 1.0, true_secondary: 0.0, is_trap: false, build_cost: 3, build_weeks: 1 },
+      { id: "value-headline", label: "Rewrite the empty state with one worked example", desc: "Show 'here's what a great check-in looks like' with a single real example.", before: "an empty screen with no example to follow", after: "one worked example of a great check-in", true_primary: 3.0, true_secondary: 0.0, is_trap: false, build_cost: 3, build_weeks: 1 },
+    ],
+  },
+  {
+    id: "single-player",
+    label: "Onboarding is solo, but the value needs a teammate",
+    hypothesis: "A check-in is worthless until a teammate sees it, yet onboarding never asks them to invite anyone.",
+    evidence: {
+      stat: "Signups who invite a teammate in week one activate at roughly 3× the rate of those who stay solo.",
+      quote: "I posted updates for a week, but nobody ever saw them — so I stopped.",
+      source: "Churned user, exit survey",
+    },
+    solutions: [
+      { id: "invite-first", label: "Make inviting a teammate step one (1-click Slack import)", desc: "Before anything else, prompt the user to pull in a teammate so first value is reachable.", before: "you start alone — no one sees your check-in", after: "invite a teammate first (1-click Slack import)", true_primary: 10.0, true_secondary: 4.0, is_trap: false, build_cost: 14, build_weeks: 4 },
+      { id: "solo-bot", label: "Give solo users a simulated teammate bot", desc: "A bot 'teammate' reacts to your check-ins so you aren't posting into the void.", before: "solo users post into the void", after: "a bot teammate reacts to your check-ins", true_primary: 2.0, true_secondary: -1.0, is_trap: false, build_cost: 9, build_weeks: 3 },
+    ],
+  },
+  {
+    id: "wrong-fit",
+    label: "Many signups are wrong-fit solo users",
+    hypothesis: "Solo founders and individuals sign up but can never reach a team-based 'first value'.",
+    evidence: {
+      stat: "41% of signups list their team size as 1 — there's no one for them to check in with.",
+      quote: "A lot of our trials are solo founders. They like the idea, but they've got no team yet.",
+      source: "Priya, Sales",
+    },
+    solutions: [
+      { id: "signup-qualifier", label: "Ask 'how big is your team?' at signup and route solo users", desc: "Send solo signups to a lightweight personal mode and focus activation on real teams.", before: "everyone gets the same team-based setup", after: "ask team size, route solo users to a personal mode", true_primary: 3.0, true_secondary: 1.0, is_trap: false, build_cost: 5, build_weeks: 2 },
+    ],
+  },
+];
+
+const TESTS = [
+  { id: "hallway", label: "5-user hallway test", cost: 1, weeks: 1, validity: 0.35, blurb: "Show a rough version to about 5 people and watch. Fast — but a tiny sample, easy to be fooled." },
+  { id: "fakedoor", label: "Fake-door / in-app prompt", cost: 3, weeks: 1, validity: 0.60, blurb: "Add the button to the live app and count who clicks. Real demand — but only part of the picture." },
+  { id: "ab_cohort", label: "A/B test on a live cohort", cost: 8, weeks: 2, validity: 0.90, blurb: "Give it to a slice of real users and compare with the rest. Strong evidence — and it can catch side effects." },
+  { id: "full_build", label: "Just build & ship it", cost: null, weeks: null, validity: 1.00, blurb: "Skip the test and build it for everyone. You learn the truth — but you've already paid for the build." },
+];
+
+const BOT_TRAILS = [
+  { name: "Lean Loop", trail: [
+    ["trim-fields", "fakedoor", "build"],
+    ["explainer-video", "hallway", "drop"],
+    ["invite-first", "ab_cohort", "build"],
+  ]},
+  { name: "Ship Everything", trail: [
+    ["progress-bar", "full_build", "build"],
+    ["solo-bot", "full_build", "build"],
+    ["guided-checklist", "full_build", "build"],
+  ]},
+  { name: "Quick Wins", trail: [
+    ["sample-workspace", "fakedoor", "build"],
+    ["trim-fields", "fakedoor", "build"],
+  ]},
+];
+
+/* Public-style scenario object the render code reads (mirrors public_scenario). */
+const SCEN = { company: COMPANY, primary: PRIMARY, secondary: SECONDARY, problems: PROBLEMS, tests: TESTS };
+
+/* ---------- Lookups (scenario.py) ---------- */
+function allSolutions() {
+  const out = {};
+  for (const p of PROBLEMS) for (const s of p.solutions) out[s.id] = { ...s, problem_id: p.id };
+  return out;
+}
+const SOLUTIONS = allSolutions();
+function getSolution(id) { return SOLUTIONS[id] || null; }
+function getTest(id) { return TESTS.find(t => t.id === id) || null; }
+function buildCost(sol) { return parseInt(sol.build_cost, 10); }
+function buildWeeks(sol) { return parseInt(sol.build_weeks, 10); }
+function testCost(test, sol) { return test.id === 'full_build' ? buildCost(sol) : parseInt(test.cost, 10); }
+function testWeeks(test, sol) { return test.id === 'full_build' ? buildWeeks(sol) : parseInt(test.weeks, 10); }
+
+/* ---------- Engine (sim.py) ---------- */
+/* Deterministic value in [-1, 1] from string parts. sim.py uses sha256; the solo
+   build is standalone, so a synchronous FNV-1a hash mapped to [-1,1] is enough —
+   it just has to be deterministic per (solution_id, test_id). */
+function stableUnit(...parts) {
+  const str = parts.map(String).join('|');
+  let h = 0x811c9dc5; // FNV-1a 32-bit offset basis
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return (h / 0xFFFFFFFF) * 2.0 - 1.0;
+}
+function round1(n) { return Math.round(n * 10) / 10; }
+
+function confidenceOf(validity) {
+  if (validity >= 0.85) return 'high';
+  if (validity >= 0.55) return 'medium';
+  return 'low';
+}
+
+function generateReading(solution, test) {
+  const trueP = parseFloat(solution.true_primary);
+  const v = parseFloat(test.validity);
+  const shrink = trueP * v;
+  const noiseAmp = CFG.NOISE_MAX * (1.0 - v);
+  const noise = stableUnit(solution.id, test.id) * noiseAmp;
+  const estimate = round1(shrink + noise);
+  let warn = null;
+  if (v >= CFG.TRAP_DETECT_VALIDITY && solution.is_trap) warn = 'retention_risk';
+  return {
+    estimate,
+    verdict: estimate >= CFG.ACCEPT_THRESHOLD ? 'accept' : 'reject',
+    confidence: confidenceOf(v),
+    warn,
+  };
+}
+
+function realizeBuild(team, solution) {
+  team.activation = round1(Math.max(0.0, team.activation + parseFloat(solution.true_primary)));
+  team.retention = round1(Math.max(0.0, team.retention + parseFloat(solution.true_secondary)));
+}
+
+function spend(team, m, w) {
+  team.money_left -= m; team.weeks_left -= w;
+  team.money_spent += m; team.weeks_spent += w;
+}
+function canAfford(team, m, w) { return team.money_left >= m && team.weeks_left >= w; }
+
+function scoreTeam(team) {
+  const primary_lift = round1(team.activation - PRIMARY.baseline);
+  const budget_spent = team.money_spent + CFG.WEEK_TO_MONEY * team.weeks_spent;
+  const efficiency = primary_lift / Math.max(budget_spent, CFG.MIN_DENOM);
+  const floor = SECONDARY.floor;
+  const guardrail_ok = team.retention >= floor;
+  const guardrail_pen = guardrail_ok ? 0.0 : round1(CFG.GUARDRAIL_PEN_PER_PT * (floor - team.retention));
+  const hit_target = team.activation >= PRIMARY.target;
+  const target_bonus = hit_target ? CFG.TARGET_BONUS : 0.0;
+  const score = CFG.EFFICIENCY_WEIGHT * efficiency * 100.0 + target_bonus - guardrail_pen;
+  const builds = team.experiments.filter(e => e.decision === 'build').length;
+  return {
+    primary_lift,
+    activation: team.activation,
+    retention: team.retention,
+    budget_spent: round1(budget_spent),
+    money_spent: team.money_spent,
+    weeks_spent: team.weeks_spent,
+    efficiency: Math.round(efficiency * 1000) / 1000,
+    guardrail_ok,
+    guardrail_pen,
+    hit_target,
+    target_bonus,
+    builds,
+    experiments: team.experiments.length,
+    score_short: round1(CFG.EFFICIENCY_WEIGHT * efficiency * 100.0 + target_bonus),
+    score: round1(score),
+  };
+}
+
+function computeLeaderboard(teamsObj, long_term) {
+  const rows = [];
+  for (const tid in teamsObj) {
+    const t = teamsObj[tid];
+    const s = scoreTeam(t);
+    rows.push({
+      team_id: tid, team_name: t.name, is_bot: t.is_bot,
+      ...s,
+      rank_score: long_term ? s.score : s.score_short,
+    });
+  }
+  rows.sort((a, b) => b.rank_score - a.rank_score);
+  rows.forEach((r, i) => r.rank = i + 1);
+  return rows;
+}
+
+/* ---------- Team / experiment helpers (server.py) ---------- */
+function newTeam(name, is_bot) {
+  return {
+    id: is_bot ? ('bot-' + name.toLowerCase().replace(/\s+/g, '-')) : 'you',
+    name, is_bot: !!is_bot,
+    money_left: CFG.STARTING_MONEY, weeks_left: CFG.STARTING_WEEKS,
+    money_spent: 0, weeks_spent: 0,
+    activation: PRIMARY.baseline, retention: SECONDARY.baseline,
+    experiments: [], pending: null, finished: false,
+  };
+}
+
+function makePending(solution, test, reading) {
+  return {
+    problem_id: solution.problem_id,
+    solution_id: solution.id,
+    solution_label: solution.label,
+    test_id: test.id,
+    test_label: test.label,
+    test_cost: testCost(test, solution),
+    test_weeks: testWeeks(test, solution),
+    build_cost: buildCost(solution),
+    build_weeks: buildWeeks(solution),
+    reading,
+  };
+}
+
+function recordExperiment(team, pending, solution, decision, rationale) {
+  const built = decision === 'build';
+  team.experiments.push({
+    seq: team.experiments.length + 1,
+    rationale: rationale || '',
+    problem_id: pending.problem_id,
+    solution_id: pending.solution_id,
+    solution_label: pending.solution_label,
+    test_id: pending.test_id,
+    test_label: pending.test_label,
+    test_cost: pending.test_cost,
+    test_weeks: pending.test_weeks,
+    reading: pending.reading,
+    decision,
+    build_cost: built ? pending.build_cost : 0,
+    build_weeks: built ? pending.build_weeks : 0,
+    realized_primary: built ? parseFloat(solution.true_primary) : 0.0,
+    realized_secondary: built ? parseFloat(solution.true_secondary) : 0.0,
+    is_trap: !!solution.is_trap,
+    activation_after: team.activation,
+    retention_after: team.retention,
+  });
+}
+
+/* Replay one bot step, mirroring server.py _apply_bot_step exactly. */
+function applyBotStep(team, solution_id, test_id, decision) {
+  const solution = getSolution(solution_id);
+  const test = getTest(test_id);
+  if (!solution || !test) return;
+  const tcost = testCost(test, solution);
+  const tweeks = testWeeks(test, solution);
+  if (!canAfford(team, tcost, tweeks)) return;
+  spend(team, tcost, tweeks);
+  const reading = generateReading(solution, test);
+  const pending = makePending(solution, test, reading);
+  if (test_id === 'full_build') {
+    realizeBuild(team, solution);
+    recordExperiment(team, pending, solution, 'build');
+    return;
+  }
+  if (decision === 'build' && canAfford(team, pending.build_cost, pending.build_weeks)) {
+    spend(team, pending.build_cost, pending.build_weeks);
+    realizeBuild(team, solution);
+    recordExperiment(team, pending, solution, 'build');
+  } else {
+    recordExperiment(team, pending, solution, 'drop');
+  }
+}
+
+function buildBots() {
+  const bots = {};
+  for (const spec of BOT_TRAILS) {
+    const team = newTeam(spec.name, true);
+    for (const [sid, test_id, decision] of spec.trail) applyBotStep(team, sid, test_id, decision);
+    team.finished = true;
+    bots[team.id] = team;
+  }
+  return bots;
+}
+
+/* ============================================================================
+   CLIENT STATE + RENDER
+   ============================================================================ */
+let me_ = newTeam('You', false);
+let bots_ = {};
+let player = { name: '', email: '' };
+let checklistState = { ondemand: false, recording: false };
+let onboardStep = 'brief';
+let loopSel = { problem_id: null, solution_id: null, test_id: null };
+let buildResultSeq = null;
+let rationaleDraft = '';
+let rationaleForKey = null;
+let revealLong = false;   // false = activation board, true = guardrail-adjusted
+
+function esc(s) { if (s === undefined || s === null) return ''; const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
+function money(n) { return '$' + Math.round(n) + 'K'; }
+function scen() { return SCEN; }
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); const el = document.getElementById(id); if (el) el.classList.add('active'); const eb = document.getElementById('end-sprint-bar'); if (eb && id !== 'screen-sprint') eb.style.display = 'none'; window.scrollTo({ top: 0 }); }
+
+function solutionsForProblem(pid) { const p = PROBLEMS.find(x => x.id === pid); return p ? p.solutions : []; }
+function findSolution(sid) { for (const p of PROBLEMS) for (const s of p.solutions) if (s.id === sid) return s; return null; }
+function findTest(tid) { return TESTS.find(t => t.id === tid); }
+
+/* ---------- Glossary (verbatim) ---------- */
+const GLOSSARY = {
+  activation: ["Activation", "The score you're moving — the share of new signups who reach first value (a check-in a teammate sees). Higher is the goal this quarter."],
+  retention: ["Retention", "The real goal — the share of activated users still showing up at week 4. A win only counts if it lasts."],
+  guardrail: ["Guardrail", "A number you must not harm while chasing the main one. Here it's week-4 retention: don't win activation by wrecking it."],
+  hypothesis: ["Hypothesis", "Your best guess at why the metric is stuck — phrased so a test can support or kill it."],
+  evidence: ["Evidence", "How much you can trust a test's reading. Cheap tests give low evidence (noisy); strong tests give high evidence (reliable)."],
+  firstvalue: ["First value", "The first moment a user gets the point of the product. Here: posting a check-in AND having a teammate see it."],
+  abtest: ["A/B test", "Give the change to a slice of real users, keep the rest as a control, and compare. Strong evidence, but slower and pricier."],
+  fakedoor: ["Fake-door test", "Put the button or feature in the live product before building it and count who clicks — measures real demand, cheaply."],
+  hallway: ["Hallway test", "Show a rough version to about 5 people and watch. Fast and cheap, but a tiny, noisy sample."],
+  cohort: ["Cohort", "A group of users bucketed by when they joined, so you compare like with like."],
+  efficiency: ["Efficiency", "How much activation you gained per unit of budget spent. Rewards cheap wins over expensive ones."]
+};
+function gloss(key, text) {
+  const g = GLOSSARY[key];
+  if (!g) return esc(text != null ? text : key);
+  return `<span class="gloss" data-gloss="${key}" tabindex="0" role="button">${esc(text != null ? text : g[0])}</span>`;
+}
+function showGloss(el) {
+  hideGloss();
+  const g = GLOSSARY[el.dataset.gloss]; if (!g) return;
+  const pop = document.createElement('div');
+  pop.className = 'gloss-pop'; pop.id = 'gloss-pop';
+  pop.innerHTML = `<span class="gp-term">${esc(g[0])}</span>${esc(g[1])}`;
+  document.body.appendChild(pop);
+  const r = el.getBoundingClientRect();
+  const pw = pop.offsetWidth;
+  pop.style.left = Math.min(Math.max(8, r.left), window.innerWidth - pw - 8) + 'px';
+  let top = r.bottom + 6;
+  if (top + pop.offsetHeight > window.innerHeight - 8) top = Math.max(8, r.top - pop.offsetHeight - 6);
+  pop.style.top = top + 'px';
+}
+function hideGloss() { const p = document.getElementById('gloss-pop'); if (p) p.remove(); }
+
+/* ============================================================================
+   ONBOARDING / BRIEFING
+   ============================================================================ */
+function fillBrief() {
+  const c = COMPANY, p = PRIMARY, sec = SECONDARY;
+  document.getElementById('ob-company').textContent = c.name;
+  document.getElementById('ob-tagline').textContent = c.tagline;
+  document.getElementById('ob-stage').textContent = c.stage;
+  document.getElementById('ob-brief').textContent = c.brief;
+  const logo = document.getElementById('ob-logo');
+  if (logo) logo.innerHTML = `<svg width="44" height="44" viewBox="0 0 44 44" aria-label="${esc(c.name)} logo" role="img"><rect width="44" height="44" rx="11" fill="var(--blue)"/><path d="M8 26 L15 26 L19 14 L25 32 L29 22 L36 22" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const facts = document.getElementById('ob-facts');
+  if (facts) {
+    const rows = [['Founded', c.founded], ['Base', c.hq], ['Team', c.team_size], ['Sells to', c.market], ['Pricing', c.pricing]].filter(([, v]) => v);
+    facts.innerHTML = rows.map(([k, v]) => `<div class="fact"><span class="fact-k">${esc(k)}</span><span class="fact-v">${esc(v)}</span></div>`).join('');
+  }
+  const ap = document.getElementById('ob-activation-plain'); if (ap) ap.textContent = c.activation_def_plain || '';
+  const sp = document.getElementById('ob-signup-path');
+  if (sp) sp.innerHTML = (c.signup_path || []).map(step => `<li>${esc(step)}</li>`).join('');
+  const SKIP = new Set(['activation_rate', 'week4_retention']);
+  const CLUE = new Set(['solo_signups']);
+  const NOTES = {
+    solo_signups: 'signed up with no teammates — team size of 1',
+    team_seats_avg: 'average people per paying team',
+    time_to_first_value: 'how long activation takes, when it happens',
+  };
+  document.getElementById('ob-kpis').innerHTML = Object.entries(c.kpis || {})
+    .filter(([k]) => !SKIP.has(k))
+    .map(([k, v]) => {
+      const isClue = CLUE.has(k);
+      const tag = isClue ? '<span class="clue-tag">👀 a clue?</span>' : '';
+      const note = NOTES[k] ? `<div class="metric-note">${esc(NOTES[k])}</div>` : '';
+      return `<div class="metric-item${isClue ? ' clue' : ''}"><div class="metric-label">${esc(k.replace(/_/g, ' '))}${tag}</div><div class="metric-value">${esc(v)}</div>${note}</div>`;
+    }).join('');
+  document.getElementById('ob-primary').textContent = `${p.label}: ${p.baseline}${p.unit} → ${p.target}${p.unit}`;
+  document.getElementById('ob-primary-def').textContent = p.definition;
+  document.getElementById('ob-secondary').textContent = `${sec.label}: keep ≥ ${sec.floor}${sec.unit}`;
+  document.getElementById('ob-secondary-def').textContent = sec.definition;
+  const bd = document.getElementById('ob-budget');
+  if (bd) {
+    const testCosts = TESTS.map(t => t.cost).filter(x => x != null && x > 0);
+    const buildCosts = []; PROBLEMS.forEach(pr => pr.solutions.forEach(sl => buildCosts.push(sl.build_cost)));
+    const lo = a => Math.min(...a), hi = a => Math.max(...a);
+    const tRange = testCosts.length ? `${money(lo(testCosts))}–${money(hi(testCosts))}` : '—';
+    const bRange = buildCosts.length ? `${money(lo(buildCosts))}–${money(hi(buildCosts))}` : '—';
+    bd.innerHTML = `💰 You have <strong>${money(CFG.STARTING_MONEY)}</strong> and <strong>${CFG.STARTING_WEEKS} weeks</strong>. Tests run <strong>${tRange}</strong>; builds <strong>${bRange}</strong>. That's enough for several experiments, not unlimited — screen cheap, and save the budget for the builds that matter.`;
+  }
+}
+
+function missionLine(p, sec) {
+  return `🎯 ${gloss('activation', p.label || 'Activation')} ${p.baseline}${p.unit || ''} → <strong>${p.target}${p.unit || ''}</strong>`
+    + ` &nbsp;·&nbsp; 🛡️ keep ${gloss('retention', sec.label || 'retention')} ≥ ${sec.floor}${sec.unit || ''}`;
+}
+function openBrief() {
+  const p = PRIMARY, sec = SECONDARY, c = COMPANY;
+  document.getElementById('brief-overlay-body').innerHTML = `
+    <div class="mission-anchor" style="margin-bottom:14px;">${missionLine(p, sec)}</div>
+    <p class="text-small mb-12"><strong>${esc(c.name || '')}</strong> — ${esc(c.tagline || '')}. ${esc(c.challenge || '')}</p>
+    ${p.definition ? `<div class="brief-section"><div class="overline mb-8">What counts as activation</div><p class="text-small">${esc(p.definition)}</p></div>` : ''}
+    <div class="brief-section"><div class="overline mb-8">The loop</div>
+      <ol class="brief-loop">
+        <li><strong>Pick a problem</strong> — why isn't activation higher?</li>
+        <li><strong>Pick a solution</strong> — a candidate fix.</li>
+        <li><strong>Choose a test</strong> — cheap &amp; noisy, or pricey &amp; reliable?</li>
+        <li><strong>Read the data</strong> — accept / reject, with an estimate.</li>
+        <li><strong>Build or drop</strong> — building spends the cost and moves the metric for real.</li>
+      </ol>
+    </div>
+    <div class="brief-section"><div class="overline mb-8">Reading a test</div>
+      <p class="text-small">Each test shows an <strong>evidence</strong> level. Cheap tests are noisy — their estimate can drift well off the truth — so use them to screen, then confirm a promising idea with a stronger test before you build.</p>
+    </div>
+    <div class="brief-section"><div class="overline mb-8">The guardrail</div>
+      <p class="text-small">Activation is the score, but <strong>${esc(sec.label || 'retention')}</strong> is the real goal. Some ideas lift activation while quietly hurting it — don't let the number you optimise eat the outcome you want.</p>
+    </div>
+    <div class="brief-section"><div class="overline mb-8">Glossary <span class="text-muted" style="font-weight:400; text-transform:none; letter-spacing:0;">— and tap any dotted term in the game for this</span></div>
+      <dl class="gloss-list">${Object.keys(GLOSSARY).map(k => `<dt>${esc(GLOSSARY[k][0])}</dt><dd>${esc(GLOSSARY[k][1])}</dd>`).join('')}</dl>
+    </div>`;
+  document.getElementById('brief-overlay').style.display = 'flex';
+}
+function closeBrief() { document.getElementById('brief-overlay').style.display = 'none'; }
+
+/* ============================================================================
+   SPRINT WORKSPACE
+   ============================================================================ */
+function renderSprintWorkspace() {
+  showScreen('screen-sprint');
+  const p = PRIMARY, sec = SECONDARY;
+  const ma = document.getElementById('mission-anchor');
+  if (ma) ma.innerHTML = missionLine(p, sec);
+  document.getElementById('bc-money').textContent = money(me_.money_left);
+  document.getElementById('bc-money-sub').textContent = 'of ' + money(CFG.STARTING_MONEY);
+  document.getElementById('bc-weeks').textContent = me_.weeks_left;
+  document.getElementById('bc-weeks-sub').textContent = 'of ' + CFG.STARTING_WEEKS;
+  const base = p.baseline, target = p.target, cur = me_.activation;
+  const pct = Math.max(0, Math.min(100, (cur - base) / ((target - base) || 1) * 100));
+  document.getElementById('gauge-fill').style.width = pct + '%';
+  document.getElementById('gauge-base').textContent = base + (p.unit || '');
+  document.getElementById('gauge-cur').textContent = cur + (p.unit || '');
+  document.getElementById('gauge-target').textContent = 'target ' + target + (p.unit || '');
+
+  // guardrail panel — spoiler-safe status (count/flag, never the hidden value)
+  const builds = me_.experiments.filter(e => e.decision === 'build');
+  const checked = builds.filter(e => e.reading && e.reading.confidence === 'high').length;
+  const atRisk = builds.some(e => e.reading && e.reading.warn === 'retention_risk');
+  const gl = gloss('retention', sec.label);
+  const floorTxt = (sec.floor != null) ? `${sec.floor}${sec.unit || ''}` : 'its floor';
+  let tone, status;
+  if (atRisk) { tone = 'guard-risk'; status = '⚠ At risk — you shipped past a retention warning'; }
+  else if (builds.length === 0) { tone = 'guard-unmeasured'; status = 'Hidden until the reveal'; }
+  else if (checked < builds.length) { tone = 'guard-risk'; status = `Only ${checked} of your ${builds.length} builds were checked with a strong test`; }
+  else { tone = 'guard-ok'; status = `All ${builds.length} builds checked with a strong test`; }
+  document.getElementById('guardrail-panel').innerHTML =
+    `<span class="guard-shield">🛡️</span>
+     <div class="guard-body">
+       <div class="guard-head">Guardrail · ${gl} <span class="guard-status ${tone}">${status}</span></div>
+       <div class="guard-explain">Activation is your score, but <strong>retention is the real goal</strong> — the share of activated users still active a month later. It stays hidden all sprint and we <strong>reveal it at the end</strong>: a build can lift activation while quietly hurting retention. Keep it at or above <strong>${floorTxt}</strong>, or it eats into your final result. Only a <strong>strong test</strong> can catch the damage before you ship.</div>
+     </div>`;
+
+  // "done" bar: not while a decision is still open
+  const midDecision = !!me_.pending || buildResultSeq != null;
+  const eb = document.getElementById('end-sprint-bar');
+  if (eb) eb.style.display = midDecision ? 'none' : 'block';
+
+  if (buildResultSeq != null) renderBuildResult(buildResultSeq);
+  else if (me_.pending) renderReading(me_.pending);
+  else renderPicker();
+  renderSheet('sheet-wrap');
+}
+
+function buildResultInterp(e) {
+  const predicted = e.reading.estimate;
+  const delivered = e.realized_primary;
+  const gap = Math.round((delivered - predicted) * 10) / 10;
+  const absGap = Math.abs(gap);
+  const threshold = CFG.ACCEPT_THRESHOLD;
+  const accept = e.reading.verdict === 'accept';
+  const strong = (e.reading.confidence || 'low') === 'high';
+  const fp = (predicted >= 0 ? '+' : '') + predicted;
+  const test = esc(e.test_label);
+  const tone = delivered >= threshold ? 'good' : (delivered >= 1.5 ? 'neutral' : 'warn');
+  if (!accept && delivered >= threshold) {
+    return { tone, headline: 'A winner — your cheap test nearly buried it.',
+      body: `The ${test} read <strong>${fp} (reject)</strong>, yet shipped it delivered <strong>+${delivered}</strong>. Good result — but a noisy, cheap test can just as easily hide a real winner. Confirm a promising idea with a stronger test before you walk away.` };
+  }
+  if (accept && delivered < threshold) {
+    return { tone, headline: 'The test flattered a weak idea.',
+      body: `The ${test} read <strong>${fp} (accept)</strong>, but it only delivered <strong>+${delivered}</strong> — barely moving the metric for what you spent. Cheap, low-evidence tests can talk you into duds.` };
+  }
+  if (absGap <= 1.0) {
+    if (strong) return { tone, headline: 'Clean read — the strong test paid off.',
+      body: `Predicted <strong>${fp}</strong>, delivered <strong>+${delivered}</strong>. That tight match is what a high-evidence test buys you: you can build on it with confidence.` };
+    return { tone, headline: 'Spot on — this time.',
+      body: `Predicted <strong>${fp}</strong>, delivered <strong>+${delivered}</strong> — close. With a cheap test that's partly luck; it won't always read this true.` };
+  }
+  if (gap >= 2.0) return { tone, headline: 'Your test under-read this one.',
+    body: `Predicted <strong>${fp}</strong>, delivered <strong>+${delivered}</strong>. The cheaper the test, the more its estimate swings — here it undersold the idea.` };
+  if (gap <= -2.0) return { tone, headline: 'Reality came in below the read.',
+    body: `Predicted <strong>${fp}</strong>, delivered <strong>+${delivered}</strong>. A noisy test oversold this — the gap is the cost of cheap evidence.` };
+  return { tone, headline: 'Roughly as read.',
+    body: `Predicted <strong>${fp}</strong>, delivered <strong>+${delivered}</strong>.` };
+}
+
+function renderBuildResult(seq) {
+  document.getElementById('loop-picker').style.display = 'none';
+  document.getElementById('loop-reading').style.display = 'none';
+  const el = document.getElementById('loop-result'); el.style.display = '';
+  const e = me_.experiments.find(x => x.seq === seq);
+  if (!e) { buildResultSeq = null; el.style.display = 'none'; renderPicker(); return; }
+  const predicted = e.reading.estimate, delivered = e.realized_primary;
+  const fp = (predicted >= 0 ? '+' : '') + predicted, fd = (delivered >= 0 ? '+' : '') + delivered;
+  const it = buildResultInterp(e);
+  el.innerHTML = `
+    <div class="overline mb-8">What shipping it actually did</div>
+    <div class="result-panel ${it.tone}">
+      <div class="bold" style="font-size:1.05rem;">${esc(e.solution_label)} — shipped</div>
+      <div class="result-compare">
+        <div class="result-num"><span class="rn-label">Test predicted</span>${fp}</div>
+        <div class="result-arrow">→</div>
+        <div class="result-num"><span class="rn-label">Actually delivered</span>${fd}</div>
+        <div class="result-num"><span class="rn-label">Activation now</span>${e.activation_after}%</div>
+      </div>
+      <div class="result-headline">${it.headline}</div>
+      <p class="text-small" style="line-height:1.6; margin:0;">${it.body}</p>
+      <div class="text-right mt-16"><button class="btn btn-primary" id="result-continue-btn">Continue →</button></div>
+    </div>`;
+  document.getElementById('result-continue-btn').addEventListener('click', () => { buildResultSeq = null; renderSprintWorkspace(); });
+}
+
+function renderPicker() {
+  document.getElementById('loop-reading').style.display = 'none';
+  document.getElementById('loop-result').style.display = 'none';
+  const picker = document.getElementById('loop-picker');
+  picker.style.display = '';
+  const probs = PROBLEMS;
+  const tests = TESTS;
+  const selP = loopSel.problem_id, selS = loopSel.solution_id, selT = loopSel.test_id;
+  const sol = selS ? findSolution(selS) : null;
+  const exps = me_.experiments;
+  const usedPairs = new Set(exps.map(e => `${e.solution_id}|${e.test_id}`));
+  const builtSolutions = new Set(exps.filter(e => e.decision === 'build').map(e => e.solution_id));
+  const primaryDef = PRIMARY.definition || '';
+  const wlbl = (n) => n + (n === 1 ? ' wk' : ' wks');
+  const evWord = (v) => v >= 1 ? 'certain' : (v >= 0.85 ? 'high' : (v >= 0.55 ? 'medium' : 'low'));
+  const ctChips = (cost, wks, checkAfford) => {
+    const mOver = checkAfford && me_.money_left < cost;
+    const wOver = checkAfford && me_.weeks_left < wks;
+    return `<span class="ct-chip ct-money${mOver ? ' over' : ''}">💰 ${money(cost)}</span>`
+      + `<span class="ct-chip ct-weeks${wOver ? ' over' : ''}">⏱ ${wlbl(wks)}</span>`;
+  };
+
+  let html = `<div class="pick-section"><div class="overline"><span class="step-num">1</span>Pick a problem hypothesis<span class="step-time">⏱ ~3 min</span></div>
+    <div class="pick-intro">
+      <p>You can't know which hypothesis is right yet — that's what tests are for. Weigh the <strong>evidence</strong> on each card (what the data and the team are seeing), pick the one it points to most, and screen it cheaply. <strong>Being wrong is fine; not testing is the mistake.</strong></p>
+      ${primaryDef ? `<p class="pick-clue">📊 What counts as activation: ${esc(primaryDef)}</p>` : ''}
+      <p class="pace-note">⏱ Take your time — there's no clock in solo practice. A full loop (pick → test → decide) is a few minutes; your $50K and 14 weeks are enough for <strong>3–4 experiments</strong>.</p>
+    </div>
+    <div class="pick-prompt">💬 <strong>Think it through:</strong> which hypothesis does the evidence point to — and which feels like a hunch you could screen cheaply first?</div>
+    <div class="pick-grid">` + probs.map(p => `
+      <div class="pick-opt ${selP === p.id ? 'selected' : ''}" data-prob="${p.id}">
+        <div class="po-title">${esc(p.label)}</div>
+        <div class="po-desc">${esc(p.hypothesis)}</div>
+        ${p.evidence ? `<div class="po-evidence">
+          <div class="po-ev-label">Evidence</div>
+          ${p.evidence.stat ? `<div class="po-ev-stat">📊 ${esc(p.evidence.stat)}</div>` : ''}
+          ${p.evidence.quote ? `<div class="po-ev-quote">“${esc(p.evidence.quote)}”${p.evidence.source ? `<span class="po-ev-src">— ${esc(p.evidence.source)}</span>` : ''}</div>` : ''}
+        </div>` : ''}
+      </div>`).join('') + `</div></div>`;
+
+  html += `<div class="pick-section ${selP ? '' : 'muted-step'}"><div class="overline"><span class="step-num">2</span>Pick a solution to test<span class="step-time">⏱ ~3 min</span></div>`;
+  if (selP) {
+    html += `<div class="pick-prompt">💬 <strong>Think it through:</strong> which of these gets at the <em>root cause</em> of the problem, and which only treats a symptom? If a test came back positive, is the gain worth the build cost?</div>`;
+    html += `<div class="pick-grid">` + solutionsForProblem(selP).map(s => {
+      const shipped = builtSolutions.has(s.id);
+      return `<div class="pick-opt ${selS === s.id ? 'selected' : ''}${shipped ? ' pick-disabled' : ''}" ${shipped ? '' : `data-sol="${s.id}"`}>
+        <div class="po-title">${esc(s.label)}${shipped ? ' <span class="pick-flag flag-shipped">✓ already shipped</span>' : ''}</div>
+        <div class="ba-row">
+          <span class="ba-before"><span class="ba-tag">now</span>${esc(s.before || s.desc)}</span>
+          <span class="ba-arrow">→</span>
+          <span class="ba-after"><span class="ba-tag">after</span>${esc(s.after || '')}</span>
+        </div>
+        <div class="ct-row"><span class="ct-note">to build</span>${ctChips(s.build_cost, s.build_weeks, false)}</div>
+        ${shipped ? '<div class="pick-note">You\'ve already built this — its impact is locked in.</div>' : ''}
+      </div>`; }).join('') + `</div>`;
+  } else { html += `<p class="text-small text-muted mt-8">Choose a problem first.</p>`; }
+  html += `</div>`;
+
+  html += `<div class="pick-section ${selS ? '' : 'muted-step'}"><div class="overline"><span class="step-num">3</span>Choose how to test it<span class="step-time">⏱ ~2 min</span></div>`;
+  if (selS) {
+    html += `<div class="pick-prompt">💬 <strong>Think it through:</strong> what's the <em>cheapest</em> test that would actually change your decision? Screen a hunch cheaply — save the strong, pricey test for the idea you're about to bet the build on.</div>`;
+    html += `<div class="pick-grid">` + tests.map(t => {
+      const cost = testCost(t, sol), wks = testWeeks(t, sol);
+      const vw = Math.round((t.validity || 0) * 60);
+      const used = usedPairs.has(`${selS}|${t.id}`);
+      return `<div class="pick-opt ${selT === t.id ? 'selected' : ''}${used ? ' pick-disabled' : ''}" ${used ? '' : `data-test="${t.id}"`}>
+        <div class="po-title">${esc(t.label)}${used ? ' <span class="pick-flag">already run</span>' : ''}</div>
+        <div class="po-desc">${esc(t.blurb)}</div>
+        <div class="ct-row">${ctChips(cost, wks, true)}
+          <span class="ct-evidence"><strong>${evWord(t.validity || 0)}</strong> evidence <span class="test-validity" style="width:${vw}px;"></span> ${Math.round((t.validity || 0) * 100)}%</span>
+        </div>
+        ${used ? '<div class="pick-note">Same test, same idea → you\'d get the exact same reading. Try a different test, or a different idea.</div>' : ''}
+      </div>`;
+    }).join('') + `</div>`;
+  } else { html += `<p class="text-small text-muted mt-8">Choose a solution first.</p>`; }
+  html += `</div>`;
+
+  const ready = selP && selS && selT;
+  let affordNote = '';
+  if (ready) {
+    const t = findTest(selT); const cost = testCost(t, sol), wks = testWeeks(t, sol);
+    if (me_.money_left < cost || me_.weeks_left < wks) affordNote = `<p class="red text-small mt-8">Not enough budget or weeks left for this test.</p>`;
+  }
+  html += `<div class="text-right mt-8"><button class="btn btn-primary btn-lg" id="run-test-btn" ${ready ? '' : 'disabled'}>Run the test →</button>${affordNote}</div>`;
+  picker.innerHTML = html;
+
+  picker.querySelectorAll('[data-prob]').forEach(el => el.addEventListener('click', () => { loopSel = { problem_id: el.dataset.prob, solution_id: null, test_id: null }; renderPicker(); }));
+  picker.querySelectorAll('[data-sol]').forEach(el => el.addEventListener('click', () => { loopSel.solution_id = el.dataset.sol; loopSel.test_id = null; renderPicker(); }));
+  picker.querySelectorAll('[data-test]').forEach(el => el.addEventListener('click', () => { loopSel.test_id = el.dataset.test; renderPicker(); }));
+  const rb = document.getElementById('run-test-btn'); if (rb) rb.addEventListener('click', runTest);
+}
+
+function renderReading(pending) {
+  document.getElementById('loop-picker').style.display = 'none';
+  document.getElementById('loop-result').style.display = 'none';
+  const el = document.getElementById('loop-reading');
+  el.style.display = '';
+  const pkey = pending.solution_id + ':' + pending.test_id;
+  if (pkey !== rationaleForKey) { rationaleForKey = pkey; rationaleDraft = ''; }
+  const r = pending.reading;
+  const accept = r.verdict === 'accept';
+  const conf = r.confidence || 'low';
+  const canBuild = me_.money_left >= pending.build_cost && me_.weeks_left >= pending.build_weeks;
+  const isRisk = r.warn === 'retention_risk';
+
+  const RELIABILITY = {
+    low: '⚠ Low-evidence test — noisy, and could be well off the true impact. Treat it as a screen, not proof.',
+    medium: 'Moderate evidence — a useful signal, but not the final word.',
+    high: 'Strong evidence — this is a reliable reading.'
+  };
+
+  let rec;
+  if (isRisk) {
+    rec = { label: '⚠ Risky', cls: 'rec-risk', line: `This test was strong enough to catch a side effect — shipping this looks likely to <strong>hurt week-4 retention</strong>. The activation gain probably isn't worth the guardrail hit.` };
+  } else if (accept && conf === 'high') {
+    rec = { label: 'Strong candidate', cls: 'rec-go', line: `A clear lift, and a reliable test behind it. Good to build on.` };
+  } else if (accept && conf === 'medium') {
+    rec = { label: 'Looks worth it', cls: 'rec-go', line: `A decent lift on a fair test. Reasonable to build — or confirm with a stronger test first if you want to be sure.` };
+  } else if (accept && conf === 'low') {
+    rec = { label: 'Promising — confirm first', cls: 'rec-maybe', line: `The estimate looks good, but this was a cheap, noisy test. Confirm with a stronger one before you commit the build budget.` };
+  } else if (!accept && conf !== 'low') {
+    rec = { label: 'Too small to build', cls: 'rec-no', line: `A reliable read — and it's small. Building costs ${money(pending.build_cost)} for only about ${r.estimate >= 0 ? '+' : ''}${r.estimate} pts. Probably a drop.` };
+  } else {
+    rec = { label: 'Weak read', cls: 'rec-no', line: `A small result from a noisy test — cheap to learn from, but not proof. Don't build on this one alone.` };
+  }
+
+  const sol = findSolution(pending.solution_id);
+  const curT = findTest(pending.test_id);
+  const curV = curT ? (curT.validity || 0) : 1;
+  const stronger = TESTS.filter(t => t.id !== 'full_build' && (t.validity || 0) > curV).sort((a, b) => (b.validity || 0) - (a.validity || 0))[0];
+  let validateOpt = '';
+  if (stronger && sol) {
+    const cCost = testCost(stronger, sol), cWks = testWeeks(stronger, sol);
+    const aff = me_.money_left >= cCost && me_.weeks_left >= cWks;
+    const cheaper = cCost < pending.build_cost;
+    const sub = cheaper
+      ? `Not ready to commit? Run a stronger test first — at ${money(cCost)} it's cheaper than this ${money(pending.build_cost)} build and tells you more before you bet on it.`
+      : `Run a stronger test (${money(cCost)}) before building. It costs about as much as the build here, so only worth it if you're genuinely unsure.`;
+    validateOpt = `<button class="decision-opt do-validate" id="confirm-test-btn" data-test="${stronger.id}" ${aff ? '' : 'disabled'}>
+        <span class="do-title">🔬 Validate further — ${money(cCost)} / ${cWks}w</span>
+        <span class="do-sub">${sub}${aff ? ' <em>Doesn\'t build anything yet.</em>' : ' <strong>(not enough budget right now)</strong>'}</span>
+      </button>`;
+  }
+  const tgt = PRIMARY.target || 0, curAct = me_.activation || 0;
+  const remaining = Math.max(0, tgt - curAct);
+  let cue = '';
+  if (r.estimate > 0) {
+    const parts = [];
+    if (remaining > 0) parts.push(`≈ <strong>${Math.round(r.estimate / remaining * 100)}%</strong> of the +${remaining} you still need`);
+    parts.push(`~${money(pending.build_cost / r.estimate)} per point if you build`);
+    cue = parts.join(' · ');
+  } else if (remaining <= 0) { cue = `You're already at target — extra activation is pure efficiency.`; }
+  else { cue = `At this read it wouldn't really move the metric.`; }
+
+  el.innerHTML = `
+    <div class="overline mb-8">Your results</div>
+    <div class="reading-panel">
+      <div class="reading-results-head">
+        <div class="bold" style="font-size:1.05rem;">${esc(pending.solution_label)}</div>
+        <div class="text-small text-muted">Here's what came back from your <strong>${esc(pending.test_label)}</strong> — ${money(pending.test_cost)} / ${pending.test_weeks}w spent.</div>
+      </div>
+      <div class="reading-est ${accept ? 'green' : 'red'}">${r.estimate >= 0 ? '+' : ''}${r.estimate} pts</div>
+      <div class="text-small text-muted">estimated activation impact</div>
+      <div class="reading-context">${cue}</div>
+      <div class="reading-reliability ${conf}"><strong>How much to trust this:</strong> ${RELIABILITY[conf] || ''}</div>
+      <div class="reading-rec ${rec.cls}"><span class="rec-badge">${rec.label}</span><span class="rec-line">${rec.line}</span></div>
+      <div class="rationale-field">
+        <label for="rationale-input">Why this call? <span class="opt">(optional — your reasoning, revisited at the debrief)</span></label>
+        <textarea id="rationale-input" rows="2" maxlength="280" placeholder="e.g. cheap winner that fixes the root cause…"></textarea>
+      </div>
+      <div class="do-label">Three separate choices — pick one:</div>
+      <div class="decision-options">
+        <button class="decision-opt do-build" id="build-btn" ${canBuild ? '' : 'disabled'}>
+          <span class="do-title">🛠 Build it — ${money(pending.build_cost)} / ${pending.build_weeks}w</span>
+          <span class="do-sub">Ship it for real now. Spends the build cost and moves your activation — the only choice that changes your score.${canBuild ? '' : ' <strong>(not enough budget to build this)</strong>'}</span>
+        </button>
+        ${validateOpt}
+        <button class="decision-opt do-drop" id="drop-btn">
+          <span class="do-title">🗑 Drop it — free</span>
+          <span class="do-sub">Walk away from this idea. Costs nothing and saves your budget for a better bet.</span>
+        </button>
+      </div>
+    </div>`;
+  const ri = document.getElementById('rationale-input');
+  if (ri) { ri.value = rationaleDraft; ri.addEventListener('input', () => { rationaleDraft = ri.value; }); }
+  document.getElementById('build-btn').addEventListener('click', doBuild);
+  document.getElementById('drop-btn').addEventListener('click', doDrop);
+  const cb = document.getElementById('confirm-test-btn'); if (cb) cb.addEventListener('click', () => doEscalate(cb.dataset.test));
+}
+
+function renderSheet(targetId) {
+  const wrap = document.getElementById(targetId);
+  const exps = me_.experiments;
+  const reveal = revealLong;
+  if (!exps.length) { wrap.innerHTML = `<div class="empty-sheet">No experiments yet. Run your first test above.</div>`; return; }
+  const retCol = reveal ? '<th>Retention</th>' : '';
+  wrap.innerHTML = `<div style="overflow-x:auto;"><table class="sheet">
+    <thead><tr><th>#</th><th>Solution</th><th>Test</th><th>Reading</th><th>Decision</th><th>Activation</th>${retCol}</tr></thead>
+    <tbody>${exps.map(e => {
+      const built = e.decision === 'build';
+      const trap = reveal && e.is_trap && built;
+      const verdict = e.reading.verdict === 'accept' ? '<span class="green bold">accept</span>' : '<span class="red bold">reject</span>';
+      const warnMark = e.reading.warn === 'retention_risk' ? ' ⚠' : '';
+      const retCell = reveal ? `<td class="s-num">${built ? (e.realized_secondary >= 0 ? '+' : '') + e.realized_secondary : '—'}</td>` : '';
+      let deltaHtml = '';
+      if (built) {
+        const gap = Math.round((e.realized_primary - e.reading.estimate) * 10) / 10;
+        const cls = gap >= 2 ? 'under' : (gap <= -2 ? 'over' : 'close');
+        const note = Math.abs(gap) >= 2 ? ` (read ${e.reading.estimate >= 0 ? '+' : ''}${e.reading.estimate})` : '';
+        deltaHtml = `<br><span class="s-delta ${cls}">${e.realized_primary >= 0 ? '+' : ''}${e.realized_primary} delivered${note}</span>`;
+      }
+      const rationale = e.rationale ? `<div class="s-rationale">💬 ${esc(e.rationale)}</div>` : '';
+      return `<tr class="${trap ? 'trap-row' : ''}">
+        <td class="s-num">${e.seq}</td>
+        <td>${esc(e.solution_label)}${trap ? ' <span class="pill trap">trap</span>' : ''}${rationale}</td>
+        <td class="s-num">${esc(e.test_label)}<br><span class="text-muted">${money(e.test_cost)}/${e.test_weeks}w</span></td>
+        <td>${verdict} ${e.reading.estimate >= 0 ? '+' : ''}${e.reading.estimate}${warnMark}</td>
+        <td>${built ? `<span class="s-built">BUILT</span><br><span class="text-muted s-num">${money(e.build_cost)}/${e.build_weeks}w</span>` : (e.decision === 'screen' ? '<span class="s-screened">screened</span>' : '<span class="s-dropped">dropped</span>')}</td>
+        <td class="s-num bold">${e.activation_after}%${deltaHtml}</td>
+        ${retCell}
+      </tr>`;
+    }).join('')}</tbody></table></div>`;
+}
+
+/* ============================================================================
+   LOOP ACTIONS (local engine instead of server fetches)
+   ============================================================================ */
+function runTest() {
+  if (!loopSel.problem_id || !loopSel.solution_id || !loopSel.test_id) return;
+  if (me_.pending) return;
+  const solution = getSolution(loopSel.solution_id);
+  const test = getTest(loopSel.test_id);
+  if (!solution || !test) return;
+  if (solution.problem_id !== loopSel.problem_id) return;
+  const tcost = testCost(test, solution), tweeks = testWeeks(test, solution);
+  if (!canAfford(me_, tcost, tweeks)) { uiToast('Not enough budget or weeks left for this test'); return; }
+  spend(me_, tcost, tweeks);
+  const reading = generateReading(solution, test);
+  const pending = makePending(solution, test, reading);
+  if (test.id === 'full_build') {
+    realizeBuild(me_, solution);
+    recordExperiment(me_, pending, solution, 'build');
+    me_.pending = null;
+    buildResultSeq = me_.experiments[me_.experiments.length - 1].seq;
+    loopSel = { problem_id: null, solution_id: null, test_id: null };
+  } else {
+    me_.pending = pending;
+  }
+  renderSprintWorkspace();
+}
+
+function doBuild() {
+  const pending = me_.pending; if (!pending) return;
+  if (!canAfford(me_, pending.build_cost, pending.build_weeks)) { uiToast('Not enough budget to build this — you can only drop it'); return; }
+  const solution = getSolution(pending.solution_id);
+  const rationale = rationaleDraft.trim().slice(0, 280);
+  spend(me_, pending.build_cost, pending.build_weeks);
+  realizeBuild(me_, solution);
+  recordExperiment(me_, pending, solution, 'build', rationale);
+  me_.pending = null;
+  buildResultSeq = me_.experiments[me_.experiments.length - 1].seq;
+  rationaleDraft = ''; rationaleForKey = null;
+  loopSel = { problem_id: null, solution_id: null, test_id: null };
+  renderSprintWorkspace();
+}
+
+function doDrop(screened) {
+  const pending = me_.pending; if (!pending) return;
+  const solution = getSolution(pending.solution_id);
+  const rationale = rationaleDraft.trim().slice(0, 280);
+  const decision = screened === true ? 'screen' : 'drop';
+  recordExperiment(me_, pending, solution, decision, rationale);
+  me_.pending = null;
+  rationaleDraft = ''; rationaleForKey = null;
+  loopSel = { problem_id: null, solution_id: null, test_id: null };
+  renderSprintWorkspace();
+}
+
+function doEscalate(strongerTestId) {
+  const p = me_.pending; if (!p) return;
+  const problem_id = p.problem_id, solution_id = p.solution_id;
+  doDrop(true);   // record the cheap read as a "screen"
+  // now run the stronger test on the same solution
+  loopSel = { problem_id, solution_id, test_id: strongerTestId };
+  runTest();
+}
+
+/* In-page confirm + toast (no native dialogs — they block & clash with the UI). */
+function uiToast(msg) {
+  let t = document.getElementById('solo-toast');
+  if (!t) { t = document.createElement('div'); t.id = 'solo-toast'; t.className = 'solo-toast'; document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2800);
+}
+function uiConfirm(opts) {
+  const o = opts || {};
+  return new Promise(res => {
+    const ov = document.createElement('div');
+    ov.className = 'modal-overlay'; ov.style.display = 'flex';
+    ov.innerHTML = '<div class="modal-card" style="max-width:440px;">'
+      + '<h3 class="mb-8">' + (o.title || 'Are you sure?') + '</h3>'
+      + '<p class="text-small" style="line-height:1.6; white-space:pre-line;">' + (o.body || '') + '</p>'
+      + '<div class="flex gap-12 mt-16" style="justify-content:flex-end; flex-wrap:wrap;">'
+      + '<button class="btn btn-secondary" data-x="0">' + (o.cancel || 'Cancel') + '</button>'
+      + '<button class="btn btn-primary" data-x="1">' + (o.ok || 'Confirm') + '</button>'
+      + '</div></div>';
+    const done = v => { ov.remove(); res(v); };
+    ov.addEventListener('click', e => { if (e.target === ov) return done(false); const b = e.target.closest('[data-x]'); if (b) done(b.dataset.x === '1'); });
+    document.body.appendChild(ov);
+  });
+}
+
+async function endMySprint() {
+  const ok = await uiConfirm({
+    title: 'See your results now?',
+    body: "This locks in your sprint — you won't be able to run any more experiments.\n\nStill have budget or weeks left? There's no rush — you can keep going.",
+    ok: 'See my results →', cancel: 'Keep going',
+  });
+  if (!ok) { renderSprintWorkspace(); return; }
+  if (me_.pending) {
+    const solution = getSolution(me_.pending.solution_id);
+    recordExperiment(me_, me_.pending, solution, 'drop');
+    me_.pending = null;
+  }
+  me_.finished = true;
+  buildResultSeq = null;
+  revealLong = false;
+  renderReveal();
+}
+
+/* ============================================================================
+   REVEAL + LEADERBOARD
+   ============================================================================ */
+function teamsForBoard() {
+  const obj = {};
+  obj[me_.id] = me_;
+  for (const id in bots_) obj[id] = bots_[id];
+  return obj;
+}
+
+function renderReveal() {
+  showScreen('screen-reveal');
+  const long = revealLong;
+  document.getElementById('reveal-title').textContent = long ? 'And what it did to retention' : 'Activation results';
+  document.getElementById('reveal-sub').textContent = long
+    ? "The big number is each team's score: activation gained per dollar, minus a penalty if retention fell below the floor. Watch the trap-shippers drop."
+    : "The big number is each team's score: activation gained per dollar spent. (Retention — the real goal — is still hidden.)";
+  renderLeaderboard('reveal-leaderboard', long);
+  document.getElementById('toggle-reveal-btn').style.display = long ? 'none' : '';
+  document.getElementById('open-debrief-btn').style.display = long ? '' : 'none';
+}
+
+function renderLeaderboard(targetId, long) {
+  const rows = computeLeaderboard(teamsForBoard(), long);
+  const sec = SECONDARY;
+  const floor = sec.floor;
+  const wrap = document.getElementById(targetId);
+  wrap.innerHTML = rows.map(r => {
+    const you = r.team_id === me_.id;
+    const breach = long && r.guardrail_ok === false;
+    const winner = r.rank === 1 && !breach;
+    let cls = 'lb-card'; if (breach) cls += ' breach'; else if (winner) cls += ' winner'; if (you) cls += ' you';
+    const stats = `<div class="lb-stats">`
+      + `<span class="lb-stat">activation <b>${r.activation}%</b></span>`
+      + `<span class="lb-stat">lift <b>${r.primary_lift >= 0 ? '+' : ''}${r.primary_lift}</b></span>`
+      + `<span class="lb-stat">spent <b>${money(r.money_spent)}/${r.weeks_spent}w</b></span>`
+      + `</div>`;
+    let retBox = '';
+    if (long) {
+      retBox = `<div class="lb-retbox ${breach ? 'bad' : 'good'}">
+        <div class="lb-ret-num">${r.retention}%</div>
+        <div class="lb-ret-label">retention<br>${breach ? `✗ below ${floor}%` : `✓ keeps ≥ ${floor}%`}</div>
+      </div>`;
+    }
+    const scoreCls = breach ? 'red' : (winner ? 'green' : '');
+    const scoreBox = `<div class="lb-scorebox">
+        <div class="lb-score ${scoreCls}">${r.rank_score}</div>
+        <div class="lb-score-label">score${breach ? ` · −${r.guardrail_pen} penalty` : ''}</div>
+      </div>`;
+    const name = you ? 'You' : r.team_name;
+    return `<div class="${cls}">
+      <div class="lb-rank ${r.rank === 1 ? 'gold' : ''}">${r.rank}</div>
+      <div class="lb-mid"><div class="lb-name">${esc(name)}${you ? ' <span class="pill">you</span>' : ' <span class="pill">bot</span>'}${breach ? ' <span class="pill trap">guardrail breach</span>' : ''}</div>
+      ${stats}</div>
+      <div class="lb-right">${retBox}${scoreBox}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================================
+   DEBRIEF
+   ============================================================================ */
+function renderDebrief() {
+  showScreen('screen-debrief');
+  renderLeaderboard('debrief-leaderboard', true);
+  const list = document.getElementById('debrief-prompts');
+  const reflect = [
+    'Which of your builds actually moved the metric — and which fell flat? Did your cheap tests read them right?',
+    'Did anything win on activation but cost you elsewhere? What would you check before shipping next time?',
+    'What was your cheapest win — and your most expensive lesson?',
+    'Same budget, second run: what would you do differently?'
+  ];
+  list.innerHTML = reflect.map(p => `<li>${esc(p)}</li>`).join('');
+  const cEl = document.getElementById('ref-confidence');
+  const cVal = document.getElementById('ref-confidence-value');
+  cEl.oninput = () => cVal.textContent = cEl.value;
+  cVal.textContent = cEl.value;
+}
+
+/* ============================================================================
+   EMAILJS — shared d.MBA keys (same as design-case-practice)
+   ============================================================================ */
+const EMAILJS_PUBLIC_KEY = 'C16RP8PBnTudO3pTa';
+const EMAILJS_SERVICE_ID = 'service_vgc4x29';
+const EMAILJS_ADMIN_TEMPLATE = 'template_04i67k6';
+const EMAILJS_CONFIRM_TEMPLATE = 'template_fwackuq';
+const ADMIN_EMAIL = 'admin@d.mba';
+const GAME_NAME = 'The Lab';
+
+function buildReflectionPayload() {
+  const myScore = scoreTeam(me_);
+  const board = computeLeaderboard(teamsForBoard(), true);
+  const myRow = board.find(r => r.team_id === me_.id);
+  const rank = myRow ? myRow.rank : '—';
+  const builtLines = me_.experiments
+    .filter(e => e.decision === 'build')
+    .map(e => `- Built "${e.solution_label}" via ${e.test_label} (read ${e.reading.estimate >= 0 ? '+' : ''}${e.reading.estimate}, delivered activation ${e.realized_primary >= 0 ? '+' : ''}${e.realized_primary}, retention ${e.realized_secondary >= 0 ? '+' : ''}${e.realized_secondary})${e.is_trap ? ' [THE TRAP]' : ''}`);
+  const built = builtLines.length ? builtLines.join('\n') : '(built nothing)';
+  const summaryLines = [
+    `Final activation: ${me_.activation}% (target ${PRIMARY.target}%; baseline ${PRIMARY.baseline}%)`,
+    `Final retention: ${me_.retention}% (floor ${SECONDARY.floor}%) — guardrail ${myScore.guardrail_ok ? 'held' : 'BREACHED'}`,
+    `Score (guardrail-adjusted): ${myScore.score}  ·  Efficiency: ${myScore.efficiency}`,
+    `Rank vs the 3 bots: #${rank} of ${board.length}`,
+    `Hit target: ${myScore.hit_target ? 'yes' : 'no'}  ·  Builds: ${myScore.builds} / ${myScore.experiments} experiments`,
+    `Spent: ${money(me_.money_spent)} and ${me_.weeks_spent} weeks (of ${money(CFG.STARTING_MONEY)} / ${CFG.STARTING_WEEKS}w)`,
+    ``,
+    `What they built:`,
+    built,
+  ];
+  return {
+    student_name: player.name,
+    student_email: player.email,
+    game_name: GAME_NAME,
+    game_summary: summaryLines.join('\n'),
+    confidence: document.getElementById('ref-confidence').value + '/10',
+    takeaway: document.getElementById('ref-takeaway').value.trim(),
+    application: document.getElementById('ref-application').value.trim(),
+    surprise: document.getElementById('ref-surprise').value.trim(),
+    other: document.getElementById('ref-other').value.trim() || '(none)',
+    // game-specific escape hatches
+    scenario: COMPANY.name,
+    activation: me_.activation + '%',
+    retention: me_.retention + '%',
+    score: String(myScore.score),
+    rank: '#' + rank,
+  };
+}
+
+function submitReflection() {
+  const errEl = document.getElementById('ref-error');
+  const takeaway = document.getElementById('ref-takeaway').value.trim();
+  const application = document.getElementById('ref-application').value.trim();
+  const surprise = document.getElementById('ref-surprise').value.trim();
+  if (!takeaway || !application || !surprise) { errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+
+  const payload = buildReflectionPayload();
+  const btn = document.getElementById('ref-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    Promise.all([
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_ADMIN_TEMPLATE, { ...payload, to_email: ADMIN_EMAIL }),
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_CONFIRM_TEMPLATE, { ...payload, to_email: player.email }),
+    ])
+      .then(() => showSuccess())
+      .catch(err => {
+        console.error('Email send failed:', err);
+        console.log('Payload that would have been sent:', payload);
+        showSuccess();
+      });
+  } catch (err) {
+    console.error('EmailJS init failed:', err);
+    console.log('Payload that would have been sent:', payload);
+    showSuccess();
+  }
+}
+
+function showSuccess() {
+  document.getElementById('ref-confirm-email').textContent = player.email;
+  showScreen('screen-success');
+}
+
+/* ============================================================================
+   RESET / PLAY AGAIN
+   ============================================================================ */
+function resetGame() {
+  me_ = newTeam('You', false);
+  bots_ = buildBots();
+  loopSel = { problem_id: null, solution_id: null, test_id: null };
+  buildResultSeq = null;
+  rationaleDraft = ''; rationaleForKey = null;
+  revealLong = false;
+}
+function playAgain() {
+  resetGame();
+  // reset reflection inputs
+  ['ref-takeaway', 'ref-application', 'ref-surprise', 'ref-other'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const conf = document.getElementById('ref-confidence'); if (conf) conf.value = 6;
+  const sb = document.getElementById('ref-submit-btn'); if (sb) { sb.disabled = false; sb.textContent = 'Send my reflection →'; }
+  onboardStep = 'work';
+  renderSprintWorkspace();
+}
+
+/* ============================================================================
+   REGISTRATION
+   ============================================================================ */
+function toggleCheck(li) {
+  checklistState[li.dataset.key] = !checklistState[li.dataset.key];
+  li.classList.toggle('checked', checklistState[li.dataset.key]);
+}
+function submitRegistration() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const allChecked = checklistState.ondemand && checklistState.recording;
+  const errEl = document.getElementById('reg-error');
+  if (!name || !validEmail || !allChecked) { errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+  player.name = name;
+  player.email = email;
+  fillBrief();
+  onboardStep = 'brief';
+  showScreen('screen-onboard-brief');
+}
+
+/* ============================================================================
+   BINDINGS + INIT
+   ============================================================================ */
+function bind() {
+  document.getElementById('intro-start-btn').addEventListener('click', () => { showScreen('screen-register'); setTimeout(() => document.getElementById('reg-name').focus(), 50); });
+  document.querySelectorAll('#prereq-list li').forEach(li => li.addEventListener('click', () => toggleCheck(li)));
+  document.getElementById('reg-continue-btn').addEventListener('click', submitRegistration);
+  document.getElementById('reg-email').addEventListener('keydown', e => { if (e.key === 'Enter') submitRegistration(); });
+
+  document.getElementById('ob-next-btn').addEventListener('click', () => { onboardStep = 'howto'; showScreen('screen-onboard-howto'); });
+  document.getElementById('ob-back-btn').addEventListener('click', () => { onboardStep = 'brief'; showScreen('screen-onboard-brief'); });
+  document.getElementById('ob-enter-btn').addEventListener('click', () => { onboardStep = 'work'; renderSprintWorkspace(); });
+
+  document.getElementById('open-brief-btn').addEventListener('click', openBrief);
+  document.getElementById('close-brief-btn').addEventListener('click', closeBrief);
+  document.getElementById('brief-overlay').addEventListener('click', e => { if (e.target.id === 'brief-overlay') closeBrief(); });
+
+  document.getElementById('end-sprint-btn').addEventListener('click', endMySprint);
+
+  document.getElementById('toggle-reveal-btn').addEventListener('click', async () => {
+    const ok = await uiConfirm({
+      title: 'Reveal the retention impact?',
+      body: 'This flips the board to the guardrail-adjusted scores — the real result.',
+      ok: 'Reveal retention →', cancel: 'Not yet',
+    });
+    if (!ok) return;
+    revealLong = true;
+    renderReveal();
+  });
+  document.getElementById('open-debrief-btn').addEventListener('click', () => { revealLong = true; renderDebrief(); });
+
+  document.getElementById('ref-submit-btn').addEventListener('click', submitReflection);
+  document.getElementById('play-again-btn').addEventListener('click', playAgain);
+  document.getElementById('success-again-btn').addEventListener('click', playAgain);
+
+  // Glossary
+  document.addEventListener('click', e => { const g = e.target.closest('.gloss'); if (g) { e.preventDefault(); showGloss(g); } else if (!e.target.closest('.gloss-pop')) { hideGloss(); } });
+  document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && document.activeElement && document.activeElement.classList.contains('gloss')) { e.preventDefault(); showGloss(document.activeElement); } if (e.key === 'Escape') { hideGloss(); closeBrief(); } });
+  window.addEventListener('scroll', hideGloss, true);
+}
+
+function init() {
+  resetGame();
+  bind();
+  showScreen('screen-intro');
+}
+init();
+</script>
+</body>
+</html>
